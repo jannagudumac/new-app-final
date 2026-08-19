@@ -1,0 +1,184 @@
+<main class="catalog-page">
+  <section class="catalog-hero">
+    <p class="page-label">Public music catalogue</p>
+    <h1>Find music worth sharing</h1>
+    <p>Search artists, albums and tracks in our selected music collection.</p>
+
+    <form class="search-form" [formGroup]="searchForm" (ngSubmit)="search()">
+      <div class="search-input-container">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          type="search"
+          formControlName="query"
+          role="combobox"
+          aria-label="Search the music catalogue"
+          aria-autocomplete="list"
+          aria-controls="catalog-suggestions"
+          [attr.aria-expanded]="showSuggestions"
+          [attr.aria-activedescendant]="activeSuggestionIndex >= 0 ? 'catalog-suggestion-' + activeSuggestionIndex : null"
+          placeholder="Search an artist, album or track..."
+          autocomplete="off"
+          (focus)="onSearchFocus()"
+          (blur)="onSearchBlur()"
+          (keydown)="onSearchKeydown($event)">
+
+        <div
+          *ngIf="showSuggestions"
+          id="catalog-suggestions"
+          class="suggestion-panel"
+          role="listbox">
+          <p *ngIf="suggestionsLoading" class="suggestion-state">Searching...</p>
+          <button
+            *ngFor="let suggestion of suggestions; let index = index"
+            type="button"
+            role="option"
+            class="suggestion-option"
+            [id]="'catalog-suggestion-' + index"
+            [class.active]="index === activeSuggestionIndex"
+            [attr.aria-selected]="index === activeSuggestionIndex"
+            (mousedown)="$event.preventDefault()"
+            (click)="selectSuggestion(suggestion)">
+            <span class="suggestion-icon" aria-hidden="true">
+              {{ suggestion.type === 'ARTIST' ? 'A' : suggestion.type === 'ALBUM' ? '▣' : '♪' }}
+            </span>
+            <span class="suggestion-text">
+              <strong>{{ suggestion.title }}</strong>
+              <small>{{ suggestion.subtitle }} · {{ suggestion.type | titlecase }}</small>
+            </span>
+          </button>
+          <p
+            *ngIf="!suggestionsLoading && suggestions.length === 0"
+            class="suggestion-state">
+            No similar artists, albums or tracks found
+          </p>
+        </div>
+      </div>
+      <button type="submit">Search</button>
+      <button *ngIf="searchForm.value.query" type="button" class="secondary" (click)="clearSearch()">
+        Clear
+      </button>
+    </form>
+  </section>
+
+  <div class="catalog-toolbar">
+    <div class="catalog-filters" aria-label="Filter catalogue results">
+      <button type="button" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+        All ({{ result.artists.length + result.albums.length + result.tracks.length }})
+      </button>
+      <button type="button" [class.active]="activeFilter === 'tracks'" (click)="setFilter('tracks')">
+        <img src="/assets/icons/catalog-track.svg" alt=""> Tracks
+      </button>
+      <button type="button" [class.active]="activeFilter === 'albums'" (click)="setFilter('albums')">
+        <img src="/assets/icons/catalog-album.svg" alt=""> Albums
+      </button>
+      <button type="button" [class.active]="activeFilter === 'artists'" (click)="setFilter('artists')">
+        <img src="/assets/icons/catalog-artist.svg" alt=""> Artists
+      </button>
+    </div>
+    <span class="catalog-source">Curated with data from MusicBrainz</span>
+  </div>
+
+  <p *ngIf="errorMessage" class="message error">{{ errorMessage }}</p>
+  <p *ngIf="result.warnings.length" class="message">
+    Some catalogue results are temporarily incomplete: {{ result.warnings.join(' ') }}
+  </p>
+  <div *ngIf="loading" class="message-empty">Searching the catalogue...</div>
+
+  <ng-container *ngIf="!loading">
+    <section *ngIf="visibleResultCount() > 0" class="catalog-results" aria-label="Catalogue results">
+      <div
+        *ngFor="let artist of result.artists; let index = index"
+        [hidden]="activeFilter !== 'all' && activeFilter !== 'artists'"
+        (click)="openResult('artists', artist.id)"
+        (keydown.enter)="openResult('artists', artist.id)"
+        role="link"
+        tabindex="0"
+        class="result-row">
+        <span class="result-number">{{ index + 1 }}</span>
+        <span class="result-artwork artist-artwork">{{ artist.name.charAt(0) }}</span>
+        <span class="result-main">
+          <strong>{{ artist.name }}</strong>
+          <small>MusicBrainz artist</small>
+        </span>
+        <span class="type-pill artist">artist</span>
+        <span class="result-meta">Artist</span>
+        <button *ngIf="authService.isLoggedIn()" type="button" class="row-favourite"
+          [class.active]="isFavourite('artists', artist.id)"
+          [attr.aria-label]="isFavourite('artists', artist.id) ? 'Remove artist from favourites' : 'Add artist to favourites'"
+          [title]="isFavourite('artists', artist.id) ? 'Remove from favourites' : 'Add to favourites'"
+          (click)="toggleFavourite($event, 'artists', artist.id)">
+          {{ isFavourite('artists', artist.id) ? '♥' : '♡' }}
+        </button>
+        <span class="open-arrow" aria-hidden="true">→</span>
+      </div>
+
+      <div
+        *ngFor="let album of result.albums; let index = index"
+        [hidden]="activeFilter !== 'all' && activeFilter !== 'albums'"
+        (click)="openResult('albums', album.id)"
+        (keydown.enter)="openResult('albums', album.id)"
+        role="link"
+        tabindex="0"
+        class="result-row">
+        <span class="result-number">{{ (activeFilter === 'all' ? result.artists.length : 0) + index + 1 }}</span>
+        <span class="result-artwork">
+          <span aria-hidden="true">▱</span>
+          <img *ngIf="album.coverUrl" [src]="album.coverUrl" [alt]="album.title + ' cover'">
+        </span>
+        <span class="result-main">
+          <strong>{{ album.title }}</strong>
+          <small>{{ album.artistName }}</small>
+        </span>
+        <span class="type-pill album">album</span>
+        <span class="result-meta">{{ album.genres.length ? album.genres[0].name : 'Album' }}</span>
+        <span class="result-year">{{ album.releaseYear || '—' }}</span>
+        <button *ngIf="authService.isLoggedIn()" type="button" class="row-favourite"
+          [class.active]="isFavourite('albums', album.id)"
+          [attr.aria-label]="isFavourite('albums', album.id) ? 'Remove album from favourites' : 'Add album to favourites'"
+          [title]="isFavourite('albums', album.id) ? 'Remove from favourites' : 'Add to favourites'"
+          (click)="toggleFavourite($event, 'albums', album.id)">
+          {{ isFavourite('albums', album.id) ? '♥' : '♡' }}
+        </button>
+        <span class="open-arrow" aria-hidden="true">→</span>
+      </div>
+
+      <div
+        *ngFor="let track of result.tracks; let index = index"
+        [hidden]="activeFilter !== 'all' && activeFilter !== 'tracks'"
+        (click)="openResult('tracks', track.id)"
+        (keydown.enter)="openResult('tracks', track.id)"
+        role="link"
+        tabindex="0"
+        class="result-row">
+        <span class="result-number">
+          {{ (activeFilter === 'all' ? result.artists.length + result.albums.length : 0) + index + 1 }}
+        </span>
+        <span class="result-artwork">
+          <span aria-hidden="true">♪</span>
+          <img *ngIf="track.albumCoverUrl" [src]="track.albumCoverUrl" [alt]="track.albumTitle + ' cover'">
+        </span>
+        <span class="result-main">
+          <strong>{{ track.title }}</strong>
+          <small>{{ track.artistName }}<ng-container *ngIf="track.albumTitle"> · {{ track.albumTitle }}</ng-container></small>
+        </span>
+        <span class="type-pill track">track</span>
+        <span class="result-meta">{{ track.genres.length ? track.genres[0].name : 'Track' }}</span>
+        <span class="result-year">{{ formatDuration(track.durationSeconds) || '—' }}</span>
+        <button *ngIf="authService.isLoggedIn()" type="button" class="row-favourite"
+          [class.active]="isFavourite('tracks', track.id)"
+          [attr.aria-label]="isFavourite('tracks', track.id) ? 'Remove track from favourites' : 'Add track to favourites'"
+          [title]="isFavourite('tracks', track.id) ? 'Remove from favourites' : 'Add to favourites'"
+          (click)="toggleFavourite($event, 'tracks', track.id)">
+          {{ isFavourite('tracks', track.id) ? '♥' : '♡' }}
+        </button>
+        <span class="open-arrow" aria-hidden="true">→</span>
+      </div>
+    </section>
+
+    <div *ngIf="visibleResultCount() === 0" class="message-empty">
+      <strong>No music found.</strong>
+      <p *ngIf="searchForm.value.query">Try another artist, album or track name.</p>
+      <p *ngIf="!searchForm.value.query">The local catalogue is empty. Run the curated import first.</p>
+    </div>
+  </ng-container>
+</main>

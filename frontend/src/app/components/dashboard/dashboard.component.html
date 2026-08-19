@@ -1,0 +1,127 @@
+<section class="dashboard-page">
+  <header class="dashboard-hero">
+    <div class="hero-copy">
+      <p class="page-label">Welcome back</p>
+      <h1>Hello, {{ username }}</h1>
+      <p>Pick up a shared listening list or discover something new.</p>
+    </div>
+
+    <div class="hero-actions">
+      <form class="quick-search" (ngSubmit)="searchCatalog()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-4-4"></path>
+        </svg>
+        <input
+          type="search"
+          name="catalogQuery"
+          [(ngModel)]="searchQuery"
+          placeholder="Search artists, albums or songs..."
+          aria-label="Search the music catalogue">
+        <button type="submit">Search</button>
+      </form>
+
+      <a class="main-button" routerLink="/walls" [queryParams]="{ create: true }">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path>
+        </svg>
+        New wall
+      </a>
+    </div>
+  </header>
+
+  <p *ngIf="errorMessage" class="message-error">{{ errorMessage }}</p>
+
+  <div class="summary-grid">
+    <a
+      routerLink="/invitations"
+      class="summary-card card invitation-card"
+      [class.has-attention]="pendingInvitationCount > 0">
+      <span class="summary-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+      </span>
+      <span class="summary-copy">
+        <small>Pending invitations</small>
+        <strong>{{ pendingInvitationCount }}</strong>
+      </span>
+      <span class="summary-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+
+    <a routerLink="/profile" class="summary-card card">
+      <span class="summary-icon purple-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20s-7-4.35-7-10a4 4 0 017-2.65A4 4 0 0119 10c0 5.65-7 10-7 10z"></path>
+        </svg>
+      </span>
+      <span class="summary-copy">
+        <small>Favourite tracks</small>
+        <strong>{{ favouriteTrackCount }}</strong>
+      </span>
+      <span class="summary-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+
+    <a routerLink="/walls" class="summary-card card">
+      <span class="summary-icon purple-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2zm3 4h8m-8 4h8m-8 4h5"></path>
+        </svg>
+      </span>
+      <span class="summary-copy">
+        <small>Your music walls</small>
+        <strong>{{ loading ? '...' : walls.length }}</strong>
+      </span>
+      <span class="summary-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+  <div class="recent-panel">
+    <div class="panel-header">
+      <div>
+        <p class="page-label">Continue listening</p>
+        <h2>Your walls</h2>
+      </div>
+      <a routerLink="/walls">View all</a>
+    </div>
+
+    <div *ngIf="loading" class="panel-message card">Loading...</div>
+
+    <div *ngIf="!loading && recentWalls.length === 0" class="panel-message card">
+      <strong>No walls yet</strong>
+      <p>Create your first wall to start organising music.</p>
+      <a routerLink="/walls" [queryParams]="{ create: true }">Create a wall</a>
+    </div>
+
+    <div *ngIf="!loading && recentWalls.length > 0" class="recent-list card">
+      <a
+        *ngFor="let wall of recentWalls"
+        class="wall-row"
+        [routerLink]="['/walls', wall.id]">
+        <span
+          class="wall-preview"
+          [ngClass]="'wallpaper-' + (wall.wallpaper || 'NONE').toLowerCase()"
+          [style.background-color]="wall.wallpaper === 'NONE' ? (wall.wallColor || '#FFFFFF') : null"
+          aria-hidden="true">
+          <svg *ngIf="wall.wallpaper === 'NONE'" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l11-2v13M9 9l11-2M6 20c1.657 0 3-1.119 3-2.5S7.657 15 6 15s-3 1.119-3 2.5S4.343 20 6 20zm11-2c1.657 0 3-1.119 3-2.5S18.657 13 17 13s-3 1.119-3 2.5 1.343 2.5 3 2.5z"></path>
+          </svg>
+        </span>
+        <span class="wall-copy">
+          <strong>{{ wall.name }}</strong>
+          <span class="wall-meta">
+            <small>{{ wall.description || 'No description' }}</small>
+            <i aria-hidden="true">·</i>
+            <span class="wall-owner">Owner: {{ wall.ownerUsername }}</span>
+          </span>
+        </span>
+        <span class="member-avatar" [title]="'Owner: ' + wall.ownerUsername">
+          {{ wall.ownerUsername.charAt(0).toUpperCase() }}
+        </span>
+        <span class="open-wall">
+          Open <span aria-hidden="true">&rarr;</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>

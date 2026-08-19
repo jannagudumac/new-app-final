@@ -1,0 +1,27 @@
+<section>
+  <p class="page-label">Live music</p>
+  <h1>Find concerts</h1>
+  <p>Search Ticketmaster without exposing the API key to the browser.</p>
+
+  <form [formGroup]="form" (ngSubmit)="search()">
+    <input formControlName="artist" placeholder="Artist">
+    <input formControlName="city" placeholder="City (optional)">
+    <button class="main-button" [disabled]="loading">
+      {{ loading ? 'Searching...' : 'Search' }}
+    </button>
+  </form>
+
+  <p *ngIf="errorMessage" class="message-error">{{ errorMessage }}</p>
+  <div *ngIf="searched && !concerts.length" class="message-empty">
+    No upcoming events found.
+  </div>
+
+  <div class="grid">
+    <article *ngFor="let concert of concerts">
+      <time>{{ concert.date }}</time>
+      <h2>{{ concert.name }}</h2>
+      <p>{{ concert.venue }}<span *ngIf="concert.city"> · {{ concert.city }}</span></p>
+      <a [href]="concert.url" target="_blank" rel="noopener">Event details</a>
+    </article>
+  </div>
+</section>

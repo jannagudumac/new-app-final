@@ -1,0 +1,151 @@
+<section class="profile-page">
+  <p *ngIf="errorMessage" class="message-error">{{ errorMessage }}</p>
+  <div *ngIf="loading" class="message-loading message-empty">Loading profile...</div>
+
+  <ng-container *ngIf="profile">
+    <header class="profile-hero">
+      <div class="hero-pattern" aria-hidden="true"><span>♪</span><span>♫</span><span>♪</span></div>
+      <input #avatarInput type="file" class="avatar-input" accept="image/jpeg,image/png,image/webp" (change)="chooseAvatar($event)">
+      <button
+        type="button"
+        class="avatar"
+        [class.editable]="isOwnProfile"
+        [disabled]="!isOwnProfile || uploadingAvatar"
+        [attr.aria-label]="isOwnProfile ? 'Change profile picture' : profile.displayName + ' profile picture'"
+        [title]="isOwnProfile ? 'Change profile picture' : ''"
+        (click)="avatarInput.click()">
+        <img *ngIf="avatarSrc" [src]="avatarSrc" [alt]="profile.displayName + ' avatar'">
+        <span *ngIf="!avatarSrc">{{ uploadingAvatar ? '…' : profile.displayName.charAt(0).toUpperCase() }}</span>
+      </button>
+      <div class="profile-identity">
+        <p>Music profile</p>
+        <h1>{{ profile.displayName }}</h1>
+        <p *ngIf="profile.bio" class="profile-bio">{{ profile.bio }}</p>
+        <div class="profile-summary">
+          <span><strong>{{ favouriteCount }}</strong> favourites</span>
+          <span><strong>{{ profile.favouriteArtists.length }}</strong> artists</span>
+          <span><strong>{{ profile.favouriteAlbums.length }}</strong> albums</span>
+          <span><strong>{{ profile.genreStatistics.length }}</strong> genres</span>
+        </div>
+      </div>
+      <button *ngIf="isOwnProfile" type="button" class="edit-profile-button" (click)="openEditor()">Edit profile</button>
+    </header>
+
+    <div class="profile-body">
+      <section class="collection-block">
+        <div class="block-heading">
+          <p class="section-label">Music collection</p>
+          <h2>Favourites</h2>
+        </div>
+
+        <section *ngIf="profile.showArtists" class="collection-section artists-section">
+          <div class="subsection-heading">
+            <h3>Favourite artists</h3>
+            <button *ngIf="profile.favouriteArtists.length > 6" type="button" class="view-all" (click)="showAllArtists = !showAllArtists">
+              {{ showAllArtists ? 'Show less' : 'View all' }}
+            </button>
+          </div>
+          <div *ngIf="!profile.favouriteArtists.length" class="message-empty">Favourite artists from the catalogue to see them here.</div>
+          <div *ngIf="profile.favouriteArtists.length" class="artist-grid">
+            <a *ngFor="let artist of visibleArtists" [routerLink]="['/catalog/artists', artist.id]" class="artist-card">
+              <span>{{ artist.name.charAt(0).toUpperCase() }}</span>
+              <strong>{{ artist.name }}</strong>
+            </a>
+          </div>
+        </section>
+
+        <section *ngIf="profile.showAlbums" class="collection-section">
+          <div class="subsection-heading">
+            <h3>Favourite albums</h3>
+            <button *ngIf="profile.favouriteAlbums.length > 6" type="button" class="view-all" (click)="showAllAlbums = !showAllAlbums">
+              {{ showAllAlbums ? 'Show less' : 'View all' }}
+            </button>
+          </div>
+          <div *ngIf="!profile.favouriteAlbums.length" class="message-empty">Favourite albums from the catalogue to see them here.</div>
+          <div *ngIf="profile.favouriteAlbums.length" class="favourite-carousel">
+            <button type="button" class="carousel-arrow previous" aria-label="Previous favourite albums" (click)="scrollFavourites(albumSlider, -1)">‹</button>
+            <div #albumSlider class="favourite-grid" [class.expanded]="showAllAlbums">
+              <a *ngFor="let album of visibleAlbums; let index = index" [routerLink]="['/catalog/albums', album.id]" class="favourite-card">
+                <span class="album-cover" [ngClass]="'cover-tone-' + (index % 7)">
+                  <img *ngIf="album.coverUrl" [src]="album.coverUrl" [alt]="album.title + ' cover'">
+                  <span *ngIf="!album.coverUrl" aria-hidden="true">▱</span>
+                </span>
+                <strong>{{ album.title }}</strong>
+                <small>{{ album.artistName }}</small>
+              </a>
+            </div>
+            <button type="button" class="carousel-arrow next" aria-label="Next favourite albums" (click)="scrollFavourites(albumSlider, 1)">›</button>
+          </div>
+        </section>
+
+        <section *ngIf="profile.showTracks" class="collection-section tracks-section">
+          <div class="subsection-heading">
+            <h3>Favourite tracks</h3>
+            <button *ngIf="profile.favouriteTracks.length > 6" type="button" class="view-all" (click)="showAllTracks = !showAllTracks">
+              {{ showAllTracks ? 'Show less' : 'View all' }}
+            </button>
+          </div>
+          <div *ngIf="!profile.favouriteTracks.length" class="message-empty">Favourite some tracks to build your music collection.</div>
+          <div *ngIf="profile.favouriteTracks.length" class="track-grid">
+            <a *ngFor="let track of visibleTracks" [routerLink]="['/catalog/tracks', track.id]" class="track-card">
+              <span class="track-cover">
+                <img *ngIf="track.albumCoverUrl" [src]="track.albumCoverUrl" [alt]="(track.albumTitle || track.title) + ' cover'">
+                <span *ngIf="!track.albumCoverUrl" aria-hidden="true">♪</span>
+              </span>
+              <span class="track-copy"><strong>{{ track.title }}</strong><small>{{ track.artistName }}</small></span>
+              <span class="track-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+      </section>
+
+      <section *ngIf="profile.showTasteProfile" class="taste-block">
+        <div class="block-heading">
+          <p class="section-label">Taste profile</p>
+          <h2>Music taste</h2>
+        </div>
+        <div *ngIf="!profile.genreStatistics.length" class="message-empty">Favourite some music to build your genre statistics.</div>
+        <div *ngIf="profile.genreStatistics.length" class="taste-card">
+          <div class="genre-donut" [style.background]="genrePieBackground" role="img" aria-label="Favourite genre distribution">
+            <div class="donut-centre"><strong>{{ profile.genreStatistics.length }}</strong><span>genres</span></div>
+          </div>
+          <div class="genre-legend">
+            <div class="legend-heading"><span>Genre</span><span>favourites</span></div>
+            <div *ngFor="let stat of visibleGenres; let index = index" class="genre-legend-row">
+              <i [style.background-color]="genreColour(index)"></i><strong>{{ stat.genre }}</strong><span>{{ stat.count }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div *ngIf="editing && editModel" class="editor-backdrop" (click)="closeEditor()">
+      <section class="profile-editor" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title" (click)="$event.stopPropagation()">
+        <div class="editor-heading">
+          <div><p class="section-label">Profile settings</p><h2 id="edit-profile-title">Edit profile</h2></div>
+          <button type="button" class="close-editor" aria-label="Close profile editor" (click)="closeEditor()">×</button>
+        </div>
+
+        <form (ngSubmit)="saveProfile()">
+          <label>Display name<input type="text" name="displayName" [(ngModel)]="editModel.displayName" maxlength="60" required></label>
+          <label>Bio<textarea name="bio" [(ngModel)]="editModel.bio" maxlength="240" rows="3" placeholder="Prog rock, weird folk and too much Prokofiev."></textarea></label>
+          <fieldset>
+            <legend>Show on profile</legend>
+            <div class="visibility-options">
+              <label><input type="checkbox" name="showArtists" [(ngModel)]="editModel.showArtists"> Favourite artists</label>
+              <label><input type="checkbox" name="showAlbums" [(ngModel)]="editModel.showAlbums"> Favourite albums</label>
+              <label><input type="checkbox" name="showTracks" [(ngModel)]="editModel.showTracks"> Favourite tracks</label>
+              <label><input type="checkbox" name="showTasteProfile" [(ngModel)]="editModel.showTasteProfile"> Music taste</label>
+            </div>
+          </fieldset>
+
+          <p *ngIf="editError" class="message-error">{{ editError }}</p>
+          <div class="editor-actions">
+            <button type="button" class="secondary-action" (click)="closeEditor()">Cancel</button>
+            <button type="submit" class="main-button" [disabled]="saving || !editModel.displayName.trim()">{{ saving ? 'Saving...' : 'Save changes' }}</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </ng-container>
+</section>

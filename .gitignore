@@ -1,0 +1,17 @@
+# Backend generated files
+backend/target/
+*.log
+.env
+!.env.example
+
+# Frontend generated files
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Editor and operating system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

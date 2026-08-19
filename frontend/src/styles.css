@@ -1,0 +1,189 @@
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/600.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/800.css';
+@import '@fontsource/dm-serif-display/400.css';
+
+:root {
+  --color-dominant: #f36c5f;
+  --color-support: #173b44;
+  --color-dominant-soft: #fff0ed;
+  --color-page: #dff4f6;
+  --color-sidebar: #258995;
+  --color-line: #b9e1e6;
+  --color-border: #c9e4e7;
+  --color-muted: #7da6af;
+  --color-surface: #ffffff;
+  --color-error-background: #fff4f1;
+  --color-error-border: #f5b7ae;
+  --color-error-text: #a63e32;
+  --gradient-accent: linear-gradient(110deg, #f36c5f 0%, #ef7869 100%);
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --shadow-card: 0 9px 20px rgba(49, 91, 100, 0.07);
+  --focus-ring: 0 0 0 4px rgba(85, 183, 194, 0.13);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-page);
+  color: #1f2937;
+  font-size: 1rem;
+  font-family: "Nunito", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.brand,
+.mobile-title {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Common styles used by several pages. */
+.page-label {
+  color: var(--color-dominant);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  margin: 2px 0 26px;
+}
+
+.page-title h1 {
+  color: var(--color-support);
+  font-size: clamp(34px, 3.6vw, 44px);
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.page-title > div > p:last-child,
+.page-title > p:last-child {
+  color: var(--color-muted);
+  font-size: 14px;
+  margin: 10px 0 0;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.main-button {
+  align-items: center;
+  background: var(--color-dominant);
+  border: 0;
+  border-radius: 11px;
+  box-shadow: 0 7px 15px rgba(207, 86, 72, 0.16);
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: center;
+  padding: 12px 18px;
+}
+
+.main-button:hover { background: #e75c4c; }
+.main-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.main-button svg { fill: none; height: 20px; stroke: currentColor; width: 20px; }
+
+.form-field { margin-bottom: 18px; }
+
+.form-field label {
+  color: var(--color-support);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 7px;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  background: var(--color-surface);
+  border: 1px solid #a9d9df;
+  border-radius: var(--radius-control);
+  color: var(--color-support);
+  padding: 12px 13px;
+  resize: vertical;
+  width: 100%;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #55b7c2;
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.field-error {
+  color: #ad4035;
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.message-error {
+  background: var(--color-error-background);
+  border: 1px solid var(--color-error-border);
+  border-radius: 11px;
+  color: var(--color-error-text);
+  padding: 13px 16px;
+}
+
+.message-empty,
+.message-loading {
+  color: #7198a0;
+  padding: 27px;
+  text-align: center;
+}
+
+.secondary-action {
+  background: white;
+  border: 1px solid #b9dfe3;
+  color: var(--color-support);
+}
+
+/* The same wallpaper classes are used by wall previews and the wall page. */
+.wallpaper-image_1 { background-image: url('/assets/wallpapers/1.jpg'); }
+.wallpaper-image_2 { background-image: url('/assets/wallpapers/2.png'); }
+.wallpaper-image_3 { background-image: url('/assets/wallpapers/3.jpg'); }
+.wallpaper-image_4 { background-image: url('/assets/wallpapers/4.jpg'); }
+.wallpaper-image_5 { background-image: url('/assets/wallpapers/5.png'); }
+.wallpaper-image_6 { background-image: url('/assets/wallpapers/6.png'); }
+.wallpaper-image_7 { background-image: url('/assets/wallpapers/7.png'); }
+.wallpaper-image_8 { background-image: url('/assets/wallpapers/8.jpg'); }
+.wallpaper-image_9 { background-image: url('/assets/wallpapers/9.png'); }

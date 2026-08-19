@@ -1,0 +1,47 @@
+<main class="auth-page">
+  <section class="auth-card">
+    <div class="auth-heading">
+      <div class="auth-icon">
+        <svg viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l11-2v13M9 9l11-2M6 20c1.657 0 3-1.119 3-2.5S7.657 15 6 15s-3 1.119-3 2.5S4.343 20 6 20zm11-2c1.657 0 3-1.119 3-2.5S18.657 13 17 13s-3 1.119-3 2.5 1.343 2.5 3 2.5z"></path>
+        </svg>
+      </div>
+      <h1>Welcome back</h1>
+      <p>Log in to open your music walls.</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username">
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password">
+      </div>
+
+      <p *ngIf="errorMessage" class="message-error">
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || loading"
+        class="submit-button">
+        {{ loading ? 'Loading...' : 'Login' }}
+      </button>
+    </form>
+
+    <p class="auth-link">
+      No account?
+      <a routerLink="/register">Register</a>
+    </p>
+  </section>
+</main>

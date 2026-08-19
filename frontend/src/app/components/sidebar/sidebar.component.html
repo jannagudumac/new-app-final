@@ -1,0 +1,75 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <button type="button" class="brand" aria-label="Collapse sidebar" (click)="toggleCollapse()">
+      <span class="brand-logo-viewport" aria-hidden="true">
+        <img src="/assets/logos/full-logo.png" alt="">
+      </span>
+    </button>
+    <button
+      type="button"
+      class="collapse-button"
+      [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      (click)="toggleCollapse()">
+      <svg viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-navigation" aria-label="Main navigation">
+    <div class="navigation-group">
+      <p class="navigation-label">Main</p>
+      <a routerLink="/dashboard" routerLinkActive="active" class="navigation-link" title="Dashboard">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"></path></svg>
+        <span class="navigation-text">Dashboard</span>
+      </a>
+    </div>
+
+    <div class="navigation-group">
+      <p class="navigation-label">Library</p>
+      <a routerLink="/walls" routerLinkActive="active" class="navigation-link" title="My walls">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 5h16a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0120 17H4a1.5 1.5 0 01-1.5-1.5v-9A1.5 1.5 0 014 5zM8 21h8M12 17v4"></path></svg>
+        <span class="navigation-text">My walls</span>
+      </a>
+      <a routerLink="/catalog" routerLinkActive="active" class="navigation-link" title="Music catalogue">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l11-2v13M9 9l11-2M6 20c1.657 0 3-1.119 3-2.5S7.657 15 6 15s-3 1.119-3 2.5S4.343 20 6 20zm11-2c1.657 0 3-1.119 3-2.5S18.657 13 17 13s-3 1.119-3 2.5 1.343 2.5 3 2.5z"></path></svg>
+        <span class="navigation-text">Catalogue</span>
+      </a>
+    </div>
+
+    <div class="navigation-group">
+      <p class="navigation-label">Community</p>
+      <a routerLink="/profile" routerLinkActive="active" class="navigation-link" title="My profile">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"></path></svg>
+        <span class="navigation-text">Profile</span>
+      </a>
+      <a routerLink="/friends" routerLinkActive="active" class="navigation-link" title="Friends" (click)="markFriendsPageSeen()">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.5 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM16.5 12a3 3 0 100-6 3 3 0 000 6zM2.5 20a6 6 0 0112 0M14 15.5a5 5 0 017.5 4.5"></path></svg>
+        <span class="navigation-text">Friends</span>
+        <span *ngIf="pendingFriendRequestCount + pendingInvitationCount > 0" class="navigation-badge">
+          {{ pendingFriendRequestCount + pendingInvitationCount }}
+        </span>
+      </a>
+      <a routerLink="/concerts" routerLinkActive="active" class="navigation-link" title="Concerts">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 6h14a2 2 0 012 2v2a2.5 2.5 0 000 5v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2.5 2.5 0 000-5V8a2 2 0 012-2zM8 9v6M16 9v6"></path></svg>
+        <span class="navigation-text">Concerts</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a routerLink="/profile" class="user-card" title="Open profile">
+      <span class="user-avatar">{{ usernameInitial }}</span>
+      <span class="user-information">
+        <small>Signed in</small>
+        <strong>{{ authService.getUsername() }}</strong>
+      </span>
+    </a>
+
+    <button type="button" class="logout-button" title="Logout" aria-label="Logout" (click)="logout()">
+      <svg viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 17l5-5-5-5m5 5H3m10-9h6a2 2 0 012 2v14a2 2 0 01-2 2h-6"></path>
+      </svg>
+    </button>
+  </div>
+</aside>

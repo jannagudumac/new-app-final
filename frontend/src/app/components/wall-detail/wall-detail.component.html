@@ -1,0 +1,369 @@
+<section class="wall-page-content">
+  <div
+    *ngIf="wall"
+    class="page-wallpaper"
+    [ngClass]="'wallpaper-' + wall.wallpaper.toLowerCase()"
+    [style.--wall-color]="wall.wallColor">
+  </div>
+
+  <div *ngIf="loading" class="page-message">Loading...</div>
+  <p *ngIf="errorMessage" class="message-error">{{ errorMessage }}</p>
+
+  <ng-container *ngIf="wall && !loading">
+    <a routerLink="/walls" class="wall-back-link">&larr; Back to my walls</a>
+
+    <div class="wall-topbar">
+      <header class="wall-header">
+      <div class="wall-heading-row">
+      <div class="wall-title">
+        <div *ngIf="editingWallField !== 'name'" class="wall-title-line">
+          <h1>{{ wall.name }}</h1>
+          <button *ngIf="wall.ownerUsername === authService.getUsername()" type="button" class="wall-field-edit-button" aria-label="Edit wall name" title="Edit wall name" (click)="startWallFieldEdit('name')">
+            <img src="/assets/icons/section-pencil.svg" alt="">
+          </button>
+        </div>
+        <div *ngIf="editingWallField === 'name'" class="wall-field-inline wall-name-inline">
+          <input id="wall-name-input" [(ngModel)]="editingWallValue" [ngModelOptions]="{ standalone: true }" maxlength="100" aria-label="Wall name" (keydown.enter)="$event.preventDefault(); saveWallField()" (keydown.escape)="cancelWallFieldEdit()">
+          <button type="button" aria-label="Save wall name" title="Save wall name" [disabled]="!editingWallValue.trim()" (click)="saveWallField()"><img src="/assets/icons/section-check.svg" alt=""></button>
+        </div>
+
+        <div *ngIf="editingWallField !== 'description'" class="wall-title-line wall-description-line">
+          <p>{{ wall.description || 'No description' }}</p>
+          <button *ngIf="wall.ownerUsername === authService.getUsername()" type="button" class="wall-field-edit-button" aria-label="Edit wall description" title="Edit wall description" (click)="startWallFieldEdit('description')">
+            <img src="/assets/icons/section-pencil.svg" alt="">
+          </button>
+        </div>
+        <div *ngIf="editingWallField === 'description'" class="wall-field-inline wall-description-inline">
+          <input id="wall-description-input" [(ngModel)]="editingWallValue" [ngModelOptions]="{ standalone: true }" maxlength="500" aria-label="Wall description" placeholder="No description" (keydown.enter)="$event.preventDefault(); saveWallField()" (keydown.escape)="cancelWallFieldEdit()">
+          <button type="button" aria-label="Save wall description" title="Save wall description" (click)="saveWallField()"><img src="/assets/icons/section-check.svg" alt=""></button>
+        </div>
+      </div>
+      <div class="wall-header-actions">
+        <button
+          type="button"
+          class="customize-button"
+          [attr.aria-expanded]="appearanceOpen"
+          (click)="toggleAppearance()">
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a9 9 0 100 18h1.3a1.7 1.7 0 001.2-2.9 1.7 1.7 0 011.2-2.9H18A3 3 0 0021 12a9 9 0 00-9-9z"></path>
+            <circle cx="7.5" cy="11" r="1"></circle>
+            <circle cx="10" cy="7" r="1"></circle>
+            <circle cx="15" cy="7.5" r="1"></circle>
+          </svg>
+          Customize
+        </button>
+
+        <div *ngIf="appearanceOpen" class="appearance-popover">
+          <div class="appearance-title">
+            <div>
+              <strong>Wall appearance</strong>
+              <span>Choose a background and color</span>
+            </div>
+            <button type="button" aria-label="Close appearance panel" (click)="toggleAppearance()">×</button>
+          </div>
+
+          <div class="wallpaper-grid">
+            <button
+              *ngFor="let option of wallpaperOptions"
+              type="button"
+              class="wallpaper-choice"
+              [class.selected]="wall.wallpaper === option.value"
+              (click)="changeWallpaper(option.value)">
+              <span
+                class="wallpaper-thumbnail"
+                [ngClass]="'wallpaper-' + option.value.toLowerCase()"
+                [style.--wall-color]="wall.wallColor">
+              </span>
+              <span>{{ option.label }}</span>
+            </button>
+          </div>
+
+          <div *ngIf="wall.wallpaper === 'NONE'" class="color-control">
+            <div>
+              <strong>Wall color</strong>
+              <span>{{ wall.wallColor }}</span>
+            </div>
+            <label class="color-wheel" for="wall-color" title="Choose wall color">
+              <input
+                id="wall-color"
+                type="color"
+                [(ngModel)]="wall.wallColor"
+                (ngModelChange)="changeWallColor($event)">
+              <span class="wheel-face">
+                <span [style.background-color]="wall.wallColor"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+      </div>
+
+    <section class="members-panel">
+      <div class="members-inline">
+        <h2>People</h2>
+
+        <div class="member-list" aria-label="Wall members">
+          <a
+            *ngFor="let member of members"
+            class="member-chip"
+            [routerLink]="['/users', member.username]"
+            [attr.aria-label]="'Open ' + member.username + '\'s profile'">
+            <span class="member-avatar">{{ member.username.charAt(0).toUpperCase() }}</span>
+            <span class="member-copy">
+              <strong>{{ member.username }}</strong>
+              <small>{{ member.role | titlecase }}</small>
+            </span>
+          </a>
+        </div>
+
+        <button
+          *ngIf="wall.ownerUsername === authService.getUsername()"
+          type="button"
+          class="add-people-button"
+          [attr.aria-expanded]="showInviteForm"
+          (click)="toggleInviteForm()">
+          <span aria-hidden="true">+</span>
+          {{ showInviteForm ? 'Close' : 'Add people' }}
+        </button>
+      </div>
+
+      <form
+        *ngIf="wall.ownerUsername === authService.getUsername() && showInviteForm"
+        #inviteForm="ngForm"
+        class="invite-form"
+        (ngSubmit)="inviteMember()">
+        <label for="invite-username">Choose a friend</label>
+        <div class="invite-row">
+          <select
+            id="invite-username"
+            [(ngModel)]="inviteUsername"
+            name="inviteUsername"
+            required>
+            <option value="" disabled>Select a friend</option>
+            <option *ngFor="let friend of availableFriends" [value]="friend.username">
+              {{ friend.username }}
+            </option>
+          </select>
+          <button type="submit" [disabled]="inviteForm.invalid || inviting">
+            {{ inviting ? 'Sending...' : 'Send invitation' }}
+          </button>
+        </div>
+        <p *ngIf="availableFriends.length" class="invite-help">Your friend will join this wall after accepting the invitation.</p>
+        <p *ngIf="!availableFriends.length" class="invite-help">
+          No more friends are available. <a routerLink="/friends">Find friends</a> first.
+        </p>
+        <p *ngIf="inviteMessage" class="invite-success">{{ inviteMessage }}</p>
+        <p *ngIf="inviteError" class="invite-error">{{ inviteError }}</p>
+      </form>
+    </section>
+      </header>
+    </div>
+
+    <div class="wall-board">
+    <div class="section-list">
+      <article
+        *ngFor="let section of wall.sections"
+        class="music-section"
+        [attr.id]="'section-' + section.id"
+        [ngClass]="'note-color-' + section.noteColor.toLowerCase()">
+        <header class="section-header">
+          <div class="section-title-block">
+            <div *ngIf="editingSectionId !== section.id" class="section-name-row">
+              <h2>{{ section.name }}</h2>
+              <button
+                type="button"
+                class="section-name-edit-button"
+                aria-label="Rename section"
+                title="Rename section"
+                (click)="startSectionEdit(section.id, section.name)">
+                <img src="/assets/icons/section-pencil.svg" alt="">
+              </button>
+            </div>
+
+            <div *ngIf="editingSectionId === section.id" class="inline-section-name-edit">
+              <input
+                [id]="'section-name-' + section.id"
+                [(ngModel)]="editingSectionName"
+                [ngModelOptions]="{ standalone: true }"
+                aria-label="Section name"
+                (keydown.enter)="$event.preventDefault(); updateSection(section.id, section.noteColor)"
+                (keydown.escape)="cancelSectionEdit()">
+              <button
+                type="button"
+                class="section-name-confirm-button"
+                aria-label="Save section name"
+                title="Save section name"
+                [disabled]="!editingSectionName.trim()"
+                (click)="updateSection(section.id, section.noteColor)">
+                <img src="/assets/icons/section-check.svg" alt="">
+              </button>
+            </div>
+            <span>{{ section.items.length }} items</span>
+          </div>
+
+          <div class="section-actions">
+            <div class="section-colour-control">
+              <button
+                type="button"
+                class="section-icon-button"
+                aria-label="Change section colour"
+                title="Change section colour"
+                [attr.aria-expanded]="colorPickerSectionId === section.id"
+                (click)="toggleSectionColorPicker(section.id)">
+                <img src="/assets/icons/section-colour.svg" alt="">
+              </button>
+
+              <div
+                *ngIf="colorPickerSectionId === section.id"
+                class="section-color-palette"
+                aria-label="Choose section colour">
+                <button
+                  *ngFor="let color of sectionColors"
+                  type="button"
+                  [class.selected]="section.noteColor === color.value"
+                  [style.background-color]="color.hex"
+                  [attr.aria-label]="color.label"
+                  [title]="color.label"
+                  (click)="changeSectionColor(section, color.value)">
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="section-icon-button delete-section-button"
+              aria-label="Delete section"
+              title="Delete section"
+              (click)="deleteSection(section.id, section.name)">
+              <img src="/assets/icons/section-delete.svg" alt="">
+            </button>
+          </div>
+        </header>
+
+        <section *ngIf="activeItemFormSectionId === section.id" class="catalog-add-panel">
+          <div class="catalog-add-heading">
+            <h3>Add music</h3>
+            <button type="button" class="catalog-close-button" (click)="closeItemForm()" aria-label="Close music search">× Close</button>
+          </div>
+
+          <div class="catalog-search-field">
+            <span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg></span>
+            <input
+              [id]="'catalog-search-' + section.id"
+              type="search"
+              [(ngModel)]="catalogQuery"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="Search artist, album or track..."
+              aria-label="Search artist, album or track"
+              (ngModelChange)="queueCatalogueSearch($event)"
+              (keydown.enter)="$event.preventDefault(); searchCatalogue()">
+          </div>
+          <p *ngIf="catalogSearching" class="catalog-search-message">Searching...</p>
+          <p *ngIf="catalogSearchMessage" class="catalog-search-message">{{ catalogSearchMessage }}</p>
+
+          <div *ngIf="catalogTracks.length || catalogAlbums.length" class="catalog-result-area">
+            <h4>Results</h4>
+            <div class="catalog-result-list">
+              <article *ngFor="let track of catalogTracks" class="catalog-result-row" [class.added]="track.id && isCatalogResultAdded(section, 'TRACK', track.id)">
+                <span class="catalog-result-type">Track</span>
+                <div><strong>{{ track.title }}</strong><small>{{ track.artistName }}</small></div>
+                <button type="button" [disabled]="saving || !track.id || (track.id && isCatalogResultAdded(section, 'TRACK', track.id))" (click)="addCatalogResult(section, 'TRACK', track)">
+                  {{ track.id && isCatalogResultAdded(section, 'TRACK', track.id) ? 'Added' : '+ Add' }}
+                </button>
+              </article>
+              <article *ngFor="let album of catalogAlbums" class="catalog-result-row" [class.added]="isCatalogResultAdded(section, 'ALBUM', album.id)">
+                <span class="catalog-result-type album">Album</span>
+                <div><strong>{{ album.title }}</strong><small>{{ album.artistName }}</small></div>
+                <button type="button" [disabled]="saving || isCatalogResultAdded(section, 'ALBUM', album.id)" (click)="addCatalogResult(section, 'ALBUM', album)">
+                  {{ isCatalogResultAdded(section, 'ALBUM', album.id) ? 'Added' : '+ Add' }}
+                </button>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <div *ngIf="activeItemFormSectionId === section.id" class="section-music-heading">In this section</div>
+
+        <div *ngIf="section.items.length === 0" class="section-empty">
+          No music yet
+        </div>
+
+        <div class="item-list">
+          <div *ngFor="let item of section.items" class="music-item" [class.listened]="item.status === 'LISTENED'">
+            <div class="item-main">
+              <span class="type-badge" [title]="item.itemType === 'TRACK' ? 'Track' : 'Album'">
+                {{ item.itemType === 'TRACK' ? '♪' : '▣' }}
+              </span>
+              <div>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.artist }}</p>
+                <a
+                  *ngIf="item.catalogTrackId"
+                  [routerLink]="['/catalog/tracks', item.catalogTrackId]">
+                  Open catalogue &rarr;
+                </a>
+                <a
+                  *ngIf="item.catalogAlbumId"
+                  [routerLink]="['/catalog/albums', item.catalogAlbumId]">
+                  Open catalogue &rarr;
+                </a>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button type="button" class="status-button" (click)="toggleStatus(section.id, item)">
+                {{ item.status === 'LISTENED' ? '✓ Listened' : 'To listen' }}
+              </button>
+              <button
+                type="button"
+                class="item-delete-button"
+                [attr.aria-label]="'Delete ' + item.title"
+                [title]="'Delete ' + item.title"
+                (click)="deleteItem(section.id, item)">
+                <img src="/assets/icons/section-delete.svg" alt="">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          *ngIf="activeItemFormSectionId !== section.id"
+          type="button"
+          class="add-music-button"
+          (click)="openNewItemForm(section.id)">
+          <span aria-hidden="true">+</span> Add music
+        </button>
+      </article>
+
+      <div class="section-form" [class.is-open]="showSectionForm">
+        <button
+          *ngIf="!showSectionForm"
+          type="button"
+          class="section-form-trigger"
+          aria-label="Add a section"
+          (click)="openSectionForm()">
+          <span class="add-section-symbol" aria-hidden="true">+</span>
+          <span>Add a section</span>
+        </button>
+
+        <form
+          *ngIf="showSectionForm"
+          class="section-form-fields"
+          [formGroup]="sectionForm"
+          (ngSubmit)="createSection()">
+          <label for="section-name">Section name</label>
+          <input
+            id="section-name"
+            type="text"
+            formControlName="name"
+            placeholder="Genre, mood or theme"
+            autofocus>
+          <div class="section-form-actions">
+            <button type="button" (click)="closeSectionForm()" [disabled]="saving">Cancel</button>
+            <button type="submit" class="primary" [disabled]="saving">Add section</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    </div>
+  </ng-container>
+</section>

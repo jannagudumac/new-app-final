@@ -1,0 +1,350 @@
+.profile-page {
+  background: linear-gradient(135deg, #e7f7f8 0%, #f5f7f1 100%);
+  color: var(--color-support);
+  min-height: calc(100vh - 62px);
+  padding-bottom: 42px;
+}
+
+.profile-hero {
+  align-items: center;
+  background-image:
+    linear-gradient(90deg, rgba(19, 63, 69, 0.78), rgba(38, 74, 76, 0.35)),
+    url('/assets/backgrounds/catalog-header.jpg');
+  background-position: center 52%;
+  background-size: cover;
+  box-shadow: 0 8px 20px rgba(49, 91, 100, 0.1);
+  color: white;
+  display: flex;
+  min-height: 150px;
+  overflow: hidden;
+  padding: 24px max(36px, calc((100% - 1180px) / 2));
+  position: relative;
+}
+
+.profile-hero::after {
+  background: linear-gradient(90deg, rgba(23, 59, 68, 0.2), rgba(23, 59, 68, 0.03));
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.hero-pattern {
+  color: rgba(255, 255, 255, 0.09);
+  font-family: "DM Serif Display", serif;
+  font-size: 88px;
+  inset: -32px 16px auto auto;
+  letter-spacing: 30px;
+  position: absolute;
+  transform: rotate(-8deg);
+  white-space: nowrap;
+}
+
+.avatar {
+  align-items: center;
+  background: #df594b;
+  border: 4px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  box-shadow: 0 7px 18px rgba(23, 59, 68, 0.24);
+  display: flex;
+  flex: 0 0 96px;
+  font-family: "DM Serif Display", serif;
+  font-size: 45px;
+  height: 96px;
+  justify-content: center;
+  position: relative;
+  text-transform: lowercase;
+  z-index: 1;
+  overflow: visible;
+  padding: 0;
+}
+.avatar:disabled { color: white; }
+.avatar img { border-radius: 50%; height: 100%; object-fit: cover; width: 100%; }
+.avatar-input { display: none; }
+.avatar.editable { cursor: pointer; }
+.avatar.editable:hover { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25), 0 9px 22px rgba(23, 59, 68, 0.3); }
+
+.profile-identity { margin-left: 22px; position: relative; z-index: 1; }
+.profile-identity > p,
+.section-label {
+  font-family: "Nunito", sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  margin: 0;
+  text-transform: uppercase;
+}
+.profile-identity > p { color: rgba(255, 255, 255, 0.76); }
+.profile-identity h1 { color: white; font-size: 39px; line-height: 1; margin: 4px 0 10px; }
+.profile-bio { color: rgba(255, 255, 255, 0.92) !important; font-size: 12px !important; font-weight: 600 !important; letter-spacing: 0 !important; margin: -3px 0 9px !important; max-width: 520px; text-transform: none !important; }
+
+.profile-summary { display: flex; flex-wrap: wrap; font-size: 12px; gap: 8px 22px; }
+.profile-summary strong { font-size: 14px; margin-right: 3px; }
+
+.edit-profile-button {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 11px;
+  color: white;
+  cursor: pointer;
+  font: 700 12px "Nunito", sans-serif;
+  bottom: 22px;
+  padding: 9px 14px;
+  position: absolute;
+  right: max(36px, calc((100% - 1180px) / 2));
+  z-index: 2;
+}
+.edit-profile-button:hover { background: rgba(255, 255, 255, 0.27); }
+
+.profile-body { margin: 30px auto 0; width: min(calc(100% - 64px), 1180px); }
+.collection-block,
+.taste-block {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(23, 59, 68, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(23, 59, 68, 0.08);
+  padding: 26px 30px 30px;
+}
+.taste-block { margin-top: 26px; }
+.section-label { color: #6997a0; }
+.block-heading h2 { font-size: 30px; margin: 2px 0 0; }
+.collection-section { margin-top: 27px; }
+.tracks-section { margin-top: 33px; }
+.subsection-heading { align-items: center; display: flex; justify-content: space-between; margin-bottom: 13px; }
+.subsection-heading h3 { font-family: "Nunito", sans-serif; font-size: 16px; margin: 0; }
+
+.view-all {
+  background: transparent;
+  border: 0;
+  color: #e85f53;
+  cursor: pointer;
+  font: 700 12px "Nunito", sans-serif;
+  padding: 4px;
+}
+.view-all:hover { text-decoration: underline; }
+
+.artist-grid { display: grid; gap: 11px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.artist-card {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(23, 59, 68, 0.08);
+  border-radius: 13px;
+  color: var(--color-support);
+  display: flex;
+  gap: 10px;
+  min-height: 56px;
+  min-width: 0;
+  padding: 8px 11px;
+  text-decoration: none;
+}
+.artist-card > span {
+  align-items: center;
+  background: #fde8e4;
+  border-radius: 50%;
+  color: #f36c5f;
+  display: flex;
+  flex: 0 0 36px;
+  font-size: 15px;
+  font-weight: 800;
+  height: 36px;
+  justify-content: center;
+}
+.artist-card > strong { font: 700 13px/1.25 "Nunito", sans-serif; overflow-wrap: anywhere; }
+.artist-card:hover { box-shadow: 0 6px 15px rgba(23, 59, 68, 0.1); transform: translateY(-1px); }
+
+.favourite-carousel { position: relative; }
+.favourite-grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 3px 2px 12px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.favourite-grid::-webkit-scrollbar { display: none; }
+.favourite-grid.expanded { flex-wrap: wrap; overflow-x: visible; }
+.favourite-card { color: var(--color-support); display: block; flex: 0 0 128px; min-width: 0; scroll-snap-align: start; text-decoration: none; width: 128px; }
+.album-cover {
+  align-items: center;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  box-shadow: 0 7px 16px rgba(23, 59, 68, 0.16);
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  font-size: 27px;
+  justify-content: center;
+  overflow: hidden;
+  width: 128px;
+}
+.album-cover img { height: 100%; object-fit: cover; width: 100%; }
+.cover-tone-0 { background: #286a78; }
+.cover-tone-1 { background: #a64e1e; }
+.cover-tone-2 { background: #255f42; }
+.cover-tone-3 { background: #65317c; }
+.cover-tone-4 { background: #35436f; }
+.cover-tone-5 { background: #145c5c; }
+.cover-tone-6 { background: #7d2449; }
+.favourite-card > strong,
+.favourite-card > small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.favourite-card > strong { font: 700 12px "Nunito", sans-serif; margin-top: 8px; }
+.favourite-card > small { color: var(--color-muted); font-size: 11px; margin-top: 2px; }
+.favourite-card:hover .album-cover { box-shadow: 0 10px 22px rgba(23, 59, 68, 0.24); }
+
+.carousel-arrow {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #b6dfe4;
+  border-radius: 50%;
+  box-shadow: 0 5px 14px rgba(23, 59, 68, 0.16);
+  color: var(--color-support);
+  cursor: pointer;
+  display: flex;
+  font: 26px "Nunito", sans-serif;
+  height: 34px;
+  justify-content: center;
+  padding: 0 0 3px;
+  position: absolute;
+  top: 48px;
+  width: 34px;
+  z-index: 2;
+}
+.carousel-arrow.previous { left: -17px; }
+.carousel-arrow.next { right: -17px; }
+.carousel-arrow:hover { background: white; color: var(--color-dominant); }
+.favourite-grid.expanded ~ .carousel-arrow,
+.favourite-carousel:has(.favourite-grid.expanded) .carousel-arrow { display: none; }
+
+.track-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.track-card {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(23, 59, 68, 0.08);
+  border-radius: 12px;
+  color: var(--color-support);
+  display: grid;
+  gap: 11px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 8px 11px;
+  text-decoration: none;
+}
+.track-cover { align-items: center; background: #fde8e4; border-radius: 9px; color: #f36c5f; display: flex; height: 42px; justify-content: center; overflow: hidden; width: 42px; }
+.track-cover img { height: 100%; object-fit: cover; width: 100%; }
+.track-copy { min-width: 0; }
+.track-copy strong,
+.track-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-copy strong { font: 700 13px "Nunito", sans-serif; }
+.track-copy small { color: var(--color-muted); font-size: 11px; margin-top: 2px; }
+.track-arrow { color: #f36c5f; font-size: 17px; }
+.track-card:hover { border-color: #a9d9df; box-shadow: 0 5px 13px rgba(23, 59, 68, 0.08); }
+
+.taste-card {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(23, 59, 68, 0.08);
+  border-radius: 16px;
+  display: grid;
+  gap: 48px;
+  grid-template-columns: 210px minmax(260px, 360px);
+  margin-top: 20px;
+  padding: 25px 32px;
+}
+.genre-donut { border-radius: 50%; height: 190px; padding: 32px; width: 190px; }
+.donut-centre { align-items: center; background: #f8fcfc; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(23, 59, 68, 0.05); display: flex; flex-direction: column; height: 100%; justify-content: center; width: 100%; }
+.donut-centre strong { font-family: "DM Serif Display", serif; font-size: 31px; line-height: 1; }
+.donut-centre span { color: var(--color-muted); font-size: 11px; margin-top: 2px; }
+.genre-legend { display: grid; gap: 9px; }
+.legend-heading { color: #7198a0; display: grid; font: 800 9px "Nunito", sans-serif; grid-template-columns: 1fr auto; letter-spacing: 0.08em; margin: 0 0 1px 21px; text-transform: uppercase; }
+.genre-legend-row { align-items: center; display: grid; font-family: "Nunito", sans-serif; gap: 10px; grid-template-columns: 11px minmax(0, 1fr) auto; }
+.genre-legend-row i { border-radius: 50%; display: block; height: 11px; width: 11px; }
+.genre-legend-row > strong { font: 700 13px "Nunito", sans-serif; }
+.genre-legend-row > span { color: #7198a0; font-size: 12px; }
+
+.message-empty,
+.message-loading { background: rgba(255, 255, 255, 0.76); border: 1px dashed #b6dfe4; border-radius: 14px; padding: 24px; text-align: center; }
+.message-loading { margin: 30px auto; width: min(calc(100% - 64px), 1180px); }
+
+.editor-backdrop {
+  align-items: center;
+  background: rgba(16, 43, 49, 0.42);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 80;
+}
+
+.profile-editor {
+  background: #fbfdfd;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(16, 43, 49, 0.28);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  width: min(100%, 570px);
+}
+.editor-heading { align-items: flex-start; display: flex; justify-content: space-between; }
+.editor-heading h2 { font-size: 29px; margin: 2px 0 18px; }
+.close-editor { background: transparent; border: 0; color: #63848b; cursor: pointer; font-size: 25px; line-height: 1; padding: 2px 5px; }
+.profile-editor form > label { color: var(--color-support); display: grid; font: 700 12px "Nunito", sans-serif; gap: 6px; margin-bottom: 14px; }
+.profile-editor input[type="text"],
+.profile-editor textarea {
+  background: white;
+  border: 1px solid #badde1;
+  border-radius: 10px;
+  color: var(--color-support);
+  font: 13px "Nunito", sans-serif;
+  outline: 0;
+  padding: 10px 11px;
+  resize: vertical;
+  width: 100%;
+}
+.profile-editor input:focus,
+.profile-editor textarea:focus { border-color: #62b7c0; box-shadow: var(--focus-ring); }
+.profile-editor fieldset { border: 0; margin: 18px 0 0; padding: 0; }
+.profile-editor legend { font: 800 12px "Nunito", sans-serif; margin-bottom: 9px; }
+.visibility-options { display: grid; gap: 9px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.visibility-options label { align-items: center; display: flex; font: 600 12px "Nunito", sans-serif; gap: 7px; }
+.visibility-options input { accent-color: #f36c5f; }
+.editor-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+.editor-actions button { border-radius: 10px; cursor: pointer; font: 800 12px "Nunito", sans-serif; padding: 10px 15px; }
+.main-button { background: #f36c5f; border: 1px solid #f36c5f; color: white; }
+.main-button:disabled { cursor: default; opacity: 0.55; }
+
+@media (max-width: 800px) {
+  .artist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .track-grid { grid-template-columns: 1fr; }
+  .taste-card { gap: 28px; grid-template-columns: 170px minmax(0, 1fr); }
+  .genre-donut { height: 160px; padding: 27px; width: 160px; }
+}
+
+@media (max-width: 700px) {
+  .profile-page { min-height: calc(100vh - 58px); padding-bottom: 90px; }
+  .profile-hero { min-height: 132px; padding: 21px 18px; }
+  .avatar { flex-basis: 76px; font-size: 36px; height: 76px; }
+  .profile-identity { margin-left: 15px; min-width: 0; }
+  .profile-identity h1 { font-size: 32px; overflow: hidden; text-overflow: ellipsis; }
+  .profile-summary { font-size: 10px; gap: 5px 12px; }
+  .profile-summary strong { font-size: 12px; }
+  .edit-profile-button { bottom: 18px; padding: 8px 10px; right: 18px; }
+  .profile-body { margin-top: 18px; width: calc(100% - 28px); }
+  .collection-block,
+  .taste-block { border-radius: 16px; padding: 20px 17px 22px; }
+  .block-heading h2 { font-size: 26px; }
+  .artist-grid { grid-template-columns: 1fr; }
+  .favourite-grid { gap: 13px; }
+  .favourite-card,
+  .album-cover { width: 108px; }
+  .favourite-card { flex-basis: 108px; }
+  .carousel-arrow { height: 30px; top: 40px; width: 30px; }
+  .carousel-arrow.previous { left: -9px; }
+  .carousel-arrow.next { right: -9px; }
+  .taste-card { justify-items: center; padding: 22px 18px; grid-template-columns: 1fr; width: 100%; }
+  .genre-legend { width: 100%; }
+}
+
+@media (max-width: 460px) {
+  .visibility-options { grid-template-columns: 1fr; }
+}

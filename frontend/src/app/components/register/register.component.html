@@ -1,0 +1,57 @@
+<main class="auth-page">
+  <section class="auth-card">
+    <div class="auth-heading">
+      <div class="auth-icon">
+        <svg viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+      </div>
+      <h1>Create your account</h1>
+      <p>Start organising music with your own walls.</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username">
+        <p
+          *ngIf="registerForm.get('username')?.touched && registerForm.get('username')?.invalid"
+          class="field-error">
+          Username must contain at least 3 characters.
+        </p>
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password">
+        <p
+          *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+          class="field-error">
+          Password must contain at least 6 characters.
+        </p>
+      </div>
+
+      <p *ngIf="errorMessage" class="message-error">
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="submit"
+        [disabled]="registerForm.invalid || loading"
+        class="submit-button">
+        {{ loading ? 'Loading...' : 'Register' }}
+      </button>
+    </form>
+
+    <p class="auth-link">
+      Already registered?
+      <a routerLink="/login">Login</a>
+    </p>
+  </section>
+</main>

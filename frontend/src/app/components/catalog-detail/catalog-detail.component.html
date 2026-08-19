@@ -1,0 +1,53 @@
+<main class="detail-page">
+  <button type="button" class="back-link" (click)="goBack()">&larr; {{ backLabel }}</button>
+  <div *ngIf="loading" class="state">Loading...</div>
+  <div *ngIf="errorMessage" class="state error">{{ errorMessage }}</div>
+
+  <ng-container *ngIf="artistDetail as detail">
+    <section class="item-details artist-details">
+      <div class="large-avatar">{{ detail.artist.name.charAt(0) }}</div>
+      <div>
+        <p class="page-label">Artist</p><h1>{{ detail.artist.name }}</h1>
+        <button *ngIf="authService.isLoggedIn()" type="button" class="favourite-button" [class.active]="favourite" (click)="toggleFavourite()">{{ favourite ? '♥ Favourite' : '♡ Add to favourites' }}</button>
+      </div>
+    </section>
+    <section class="related-section">
+      <h2>Albums</h2>
+      <div *ngIf="!detail.albums.length" class="state">No albums yet.</div>
+      <div class="card-grid"><a *ngFor="let item of detail.albums" [routerLink]="['/catalog/albums', item.id]" class="related-card"><strong>{{ item.title }}</strong><span>{{ item.releaseYear || 'Year unknown' }}</span></a></div>
+    </section>
+    <section class="related-section">
+      <h2>Tracks</h2>
+      <div *ngIf="!detail.tracks.length" class="state">No tracks yet.</div>
+      <div class="track-list"><a *ngFor="let item of detail.tracks" [routerLink]="['/catalog/tracks', item.id]"><span>&#9834;</span><strong>{{ item.title }}</strong><small>{{ item.albumTitle || 'Single' }}</small></a></div>
+    </section>
+  </ng-container>
+
+  <section *ngIf="album as item" class="item-details">
+    <div class="cover-placeholder"><span>{{ item.title.charAt(0) }}</span><img *ngIf="item.coverUrl" [src]="item.coverUrl" [alt]="item.title + ' cover'"></div>
+    <div>
+      <p class="page-label">Album</p><h1>{{ item.title }}</h1>
+      <a [routerLink]="['/catalog/artists', item.artistId]" class="artist-link">{{ item.artistName }}</a>
+      <p *ngIf="item.releaseYear">Released in {{ item.releaseYear }}</p>
+      <div class="genre-list"><span *ngFor="let genre of item.genres">{{ genre.name }}</span></div>
+      <button *ngIf="authService.isLoggedIn()" type="button" class="favourite-button" [class.active]="favourite" (click)="toggleFavourite()">{{ favourite ? '♥ Favourite' : '♡ Add to favourites' }}</button>
+    </div>
+  </section>
+  <section *ngIf="album as item" class="related-section">
+    <h2>Tracks</h2>
+    <div *ngIf="!item.tracks?.length" class="state">No tracks are available for this album.</div>
+    <div *ngIf="item.tracks?.length" class="track-list"><a *ngFor="let albumTrack of item.tracks" [routerLink]="['/catalog/tracks', albumTrack.id]"><span>&#9834;</span><strong>{{ albumTrack.title }}</strong><small>{{ formatDuration(albumTrack.durationSeconds) }}</small></a></div>
+  </section>
+
+  <section *ngIf="track as item" class="item-details track-details">
+    <div class="track-symbol">&#9834;</div>
+    <div>
+      <p class="page-label">Track</p><h1>{{ item.title }}</h1>
+      <a [routerLink]="['/catalog/artists', item.artistId]" class="artist-link">{{ item.artistName }}</a>
+      <p *ngIf="item.albumId">From <a [routerLink]="['/catalog/albums', item.albumId]">{{ item.albumTitle }}</a></p>
+      <p>{{ formatDuration(item.durationSeconds) }}</p>
+      <div class="genre-list"><span *ngFor="let genre of item.genres">{{ genre.name }}</span></div>
+      <button *ngIf="authService.isLoggedIn()" type="button" class="favourite-button" [class.active]="favourite" (click)="toggleFavourite()">{{ favourite ? '♥ Favourite' : '♡ Add to favourites' }}</button>
+    </div>
+  </section>
+</main>

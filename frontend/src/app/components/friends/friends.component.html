@@ -1,0 +1,126 @@
+<section class="friends-page">
+  <header class="page-title">
+    <p class="page-label">Community</p>
+    <h1>Friends</h1>
+    <p>Find people, manage requests and see who you can invite to your music walls.</p>
+  </header>
+
+  <form class="search-card" (ngSubmit)="search()">
+    <label for="friend-search">Find people by username</label>
+    <div class="search-row">
+      <input
+        id="friend-search"
+        type="search"
+        name="query"
+        [(ngModel)]="query"
+        minlength="2"
+        autocomplete="off"
+        placeholder="For example: roby">
+      <button type="submit" [disabled]="searching">
+        {{ searching ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+  </form>
+
+  <p *ngIf="message" class="page-message success">{{ message }}</p>
+  <p *ngIf="errorMessage" class="page-message error">{{ errorMessage }}</p>
+
+  <section *ngIf="searchResults.length" class="content-card">
+    <div class="card-heading">
+      <div>
+        <p class="page-label">Search results</p>
+        <h2>People</h2>
+      </div>
+    </div>
+
+    <div class="people-list">
+      <article *ngFor="let person of searchResults" class="person-row">
+        <a [routerLink]="['/users', person.username]" class="person-identity">
+          <span class="avatar">{{ person.username.charAt(0).toUpperCase() }}</span>
+          <strong>{{ person.username }}</strong>
+        </a>
+
+        <button
+          *ngIf="person.friendshipStatus === 'NONE'"
+          type="button"
+          class="main-button"
+          (click)="sendRequest(person)">
+          + Add friend
+        </button>
+        <span *ngIf="person.friendshipStatus === 'FRIEND'" class="status-label">Friend</span>
+        <span *ngIf="person.friendshipStatus === 'PENDING_SENT'" class="status-label">Request sent</span>
+        <span *ngIf="person.friendshipStatus === 'PENDING_RECEIVED'" class="status-label">Request received below</span>
+      </article>
+    </div>
+  </section>
+
+  <div class="friends-columns">
+    <section class="content-card">
+      <div class="card-heading">
+        <div>
+          <p class="page-label">Your circle</p>
+          <h2>My friends</h2>
+        </div>
+        <span class="count">{{ friends.length }}</span>
+      </div>
+
+      <p *ngIf="!loading && !friends.length" class="message-empty">
+        You have no friends yet. Search for someone above to send a request.
+      </p>
+
+      <div class="people-list">
+        <article *ngFor="let friend of friends" class="person-row">
+          <a [routerLink]="['/users', friend.username]" class="person-identity">
+            <span class="avatar">{{ friend.username.charAt(0).toUpperCase() }}</span>
+            <strong>{{ friend.username }}</strong>
+          </a>
+          <button type="button" class="secondary-action" (click)="removeFriend(friend)">Remove</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-card">
+      <div class="card-heading">
+        <div>
+          <p class="page-label">Waiting for you</p>
+          <h2>Requests</h2>
+        </div>
+        <span class="count">{{ requests.length + invitations.length }}</span>
+      </div>
+
+      <div class="request-group">
+        <h3>Friend requests</h3>
+        <p *ngIf="!requests.length" class="message-empty">No pending friend requests.</p>
+        <div *ngIf="requests.length" class="people-list">
+          <article *ngFor="let request of requests" class="person-row request-row">
+            <a [routerLink]="['/users', request.username]" class="person-identity">
+              <span class="avatar">{{ request.username.charAt(0).toUpperCase() }}</span>
+              <strong>{{ request.username }}</strong>
+            </a>
+            <div class="request-actions">
+              <button type="button" class="main-button" (click)="answerRequest(request, true)">Accept</button>
+              <button type="button" class="secondary-action" (click)="answerRequest(request, false)">Decline</button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="request-group">
+        <h3>Wall invitations</h3>
+        <p *ngIf="!invitations.length" class="message-empty">No pending wall invitations.</p>
+        <div *ngIf="invitations.length" class="people-list">
+          <article *ngFor="let invitation of invitations" class="person-row request-row">
+            <div class="invitation-copy">
+              <strong>{{ invitation.wallName }}</strong>
+              <span>Invited by {{ invitation.invitedByUsername }}</span>
+            </div>
+            <div class="request-actions">
+              <button type="button" class="main-button" (click)="answerInvitation(invitation, true)">Accept</button>
+              <button type="button" class="secondary-action" (click)="answerInvitation(invitation, false)">Decline</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

@@ -1,0 +1,100 @@
+<section>
+  <div class="page-title">
+    <div>
+      <p class="page-label">Collection</p>
+      <h1>My music walls</h1>
+      <p>Create and manage your private listening spaces.</p>
+    </div>
+  </div>
+
+  <p *ngIf="errorMessage" class="message-error">
+    {{ errorMessage }}
+  </p>
+
+  <div *ngIf="loading" class="message-empty">
+    Loading...
+  </div>
+
+  <div *ngIf="!loading" class="wall-grid">
+    <article
+      *ngFor="let wall of walls"
+      class="wall-card card">
+      <div
+        class="wall-cover"
+        [ngClass]="'wallpaper-' + (wall.wallpaper || 'NONE').toLowerCase()"
+        [style.background-color]="wall.wallpaper === 'NONE' ? (wall.wallColor || '#FFFFFF') : null"
+        aria-hidden="true">
+      </div>
+
+      <div class="wall-card-content">
+      <div *ngIf="editingWallId !== wall.id || editingWallField !== 'name'" class="wall-card-field wall-card-name">
+        <h2>{{ wall.name }}</h2>
+        <button *ngIf="wall.ownerUsername === authService.getUsername()" type="button" class="inline-edit-button" aria-label="Edit wall name" title="Edit wall name" (click)="startEdit(wall, 'name')">
+          <img src="/assets/icons/section-pencil.svg" alt="">
+        </button>
+      </div>
+      <div *ngIf="editingWallId === wall.id && editingWallField === 'name'" class="wall-card-inline-input wall-card-name-input">
+        <input [id]="'wall-card-name-' + wall.id" [(ngModel)]="editingWallValue" maxlength="100" aria-label="Wall name" (keydown.enter)="$event.preventDefault(); updateWall(wall)" (keydown.escape)="cancelEdit()">
+        <button type="button" aria-label="Save wall name" title="Save wall name" [disabled]="!editingWallValue.trim()" (click)="updateWall(wall)"><img src="/assets/icons/section-check.svg" alt=""></button>
+      </div>
+
+      <div *ngIf="editingWallId !== wall.id || editingWallField !== 'description'" class="wall-card-field wall-card-description-field">
+        <p class="wall-description">{{ wall.description || 'No description' }}</p>
+        <button *ngIf="wall.ownerUsername === authService.getUsername()" type="button" class="inline-edit-button" aria-label="Edit wall description" title="Edit wall description" (click)="startEdit(wall, 'description')">
+          <img src="/assets/icons/section-pencil.svg" alt="">
+        </button>
+      </div>
+      <div *ngIf="editingWallId === wall.id && editingWallField === 'description'" class="wall-card-inline-input wall-card-description-input">
+        <input [id]="'wall-card-description-' + wall.id" [(ngModel)]="editingWallValue" maxlength="500" placeholder="No description" aria-label="Wall description" (keydown.enter)="$event.preventDefault(); updateWall(wall)" (keydown.escape)="cancelEdit()">
+        <button type="button" aria-label="Save wall description" title="Save wall description" (click)="updateWall(wall)"><img src="/assets/icons/section-check.svg" alt=""></button>
+      </div>
+      <div class="wall-owner-row">
+        <span class="owner-avatar">{{ wall.ownerUsername.charAt(0).toUpperCase() }}</span>
+        <span>Owner: {{ wall.ownerUsername }}</span>
+      </div>
+      <div class="wall-actions">
+        <a [routerLink]="['/walls', wall.id]" class="open-link">Open wall</a>
+        <button *ngIf="wall.ownerUsername === authService.getUsername()" type="button" class="danger icon-button" [attr.aria-label]="'Delete ' + wall.name" (click)="deleteWall(wall)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"></path></svg>
+        </button>
+      </div>
+      </div>
+    </article>
+
+    <button *ngIf="!showCreateForm" type="button" class="create-card" (click)="toggleCreateForm()">
+      <span class="create-icon" aria-hidden="true">+</span>
+      <strong>Create new wall</strong>
+      <small *ngIf="walls.length === 0">Start your first shared listening space.</small>
+    </button>
+
+    <form
+      *ngIf="showCreateForm"
+      class="create-card create-card-form"
+      [formGroup]="wallForm"
+      (ngSubmit)="createWall()">
+      <div class="quick-create-field">
+        <label for="new-wall-name">Wall name</label>
+        <input
+          id="new-wall-name"
+          type="text"
+          formControlName="name"
+          maxlength="100"
+          autocomplete="off"
+          autofocus
+          placeholder="For example: Sunday jazz">
+        <p
+          *ngIf="wallForm.get('name')?.touched && wallForm.get('name')?.invalid"
+          class="field-error">
+          A wall name is required.
+        </p>
+      </div>
+
+      <div class="quick-create-actions">
+        <button type="button" class="small-button" (click)="cancelCreate()">Cancel</button>
+        <button type="submit" class="small-button primary" [disabled]="saving || wallForm.invalid">
+          {{ saving ? 'Creating...' : 'Create' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
