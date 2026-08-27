@@ -11,15 +11,15 @@
         class="avatar"
         [class.editable]="isOwnProfile"
         [disabled]="!isOwnProfile || uploadingAvatar"
-        [attr.aria-label]="isOwnProfile ? 'Change profile picture' : profile.displayName + ' profile picture'"
+        [attr.aria-label]="isOwnProfile ? 'Change profile picture' : profile.username + ' profile picture'"
         [title]="isOwnProfile ? 'Change profile picture' : ''"
         (click)="avatarInput.click()">
-        <img *ngIf="avatarSrc" [src]="avatarSrc" [alt]="profile.displayName + ' avatar'">
-        <span *ngIf="!avatarSrc">{{ uploadingAvatar ? '…' : profile.displayName.charAt(0).toUpperCase() }}</span>
+        <img *ngIf="avatarSrc" [src]="avatarSrc" [alt]="profile.username + ' avatar'">
+        <span *ngIf="!avatarSrc">{{ uploadingAvatar ? '…' : profile.username.charAt(0).toUpperCase() }}</span>
       </button>
       <div class="profile-identity">
         <p>Music profile</p>
-        <h1>{{ profile.displayName }}</h1>
+        <h1>{{ profile.username }}</h1>
         <p *ngIf="profile.bio" class="profile-bio">{{ profile.bio }}</p>
         <div class="profile-summary">
           <span><strong>{{ favouriteCount }}</strong> favourites</span>
@@ -63,7 +63,7 @@
           </div>
           <div *ngIf="!profile.favouriteAlbums.length" class="message-empty">Favourite albums from the catalogue to see them here.</div>
           <div *ngIf="profile.favouriteAlbums.length" class="favourite-carousel">
-            <button type="button" class="carousel-arrow previous" aria-label="Previous favourite albums" (click)="scrollFavourites(albumSlider, -1)">‹</button>
+            <button *ngIf="profile.favouriteAlbums.length > 6 && !showAllAlbums" type="button" class="carousel-arrow previous" aria-label="Previous favourite albums" (click)="scrollFavourites(albumSlider, -1)">‹</button>
             <div #albumSlider class="favourite-grid" [class.expanded]="showAllAlbums">
               <a *ngFor="let album of visibleAlbums; let index = index" [routerLink]="['/catalog/albums', album.id]" class="favourite-card">
                 <span class="album-cover" [ngClass]="'cover-tone-' + (index % 7)">
@@ -74,7 +74,7 @@
                 <small>{{ album.artistName }}</small>
               </a>
             </div>
-            <button type="button" class="carousel-arrow next" aria-label="Next favourite albums" (click)="scrollFavourites(albumSlider, 1)">›</button>
+            <button *ngIf="profile.favouriteAlbums.length > 6 && !showAllAlbums" type="button" class="carousel-arrow next" aria-label="Next favourite albums" (click)="scrollFavourites(albumSlider, 1)">›</button>
           </div>
         </section>
 
@@ -127,7 +127,6 @@
         </div>
 
         <form (ngSubmit)="saveProfile()">
-          <label>Display name<input type="text" name="displayName" [(ngModel)]="editModel.displayName" maxlength="60" required></label>
           <label>Bio<textarea name="bio" [(ngModel)]="editModel.bio" maxlength="240" rows="3" placeholder="Prog rock, weird folk and too much Prokofiev."></textarea></label>
           <fieldset>
             <legend>Show on profile</legend>
@@ -142,7 +141,7 @@
           <p *ngIf="editError" class="message-error">{{ editError }}</p>
           <div class="editor-actions">
             <button type="button" class="secondary-action" (click)="closeEditor()">Cancel</button>
-            <button type="submit" class="main-button" [disabled]="saving || !editModel.displayName.trim()">{{ saving ? 'Saving...' : 'Save changes' }}</button>
+            <button type="submit" class="main-button" [disabled]="saving">{{ saving ? 'Saving...' : 'Save changes' }}</button>
           </div>
         </form>
       </section>

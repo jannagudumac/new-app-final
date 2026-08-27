@@ -5,7 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Album, ArtistDetail, Track } from '../../models/catalog.model';
 import { AuthService } from '../../services/auth.service';
 import { CatalogService } from '../../services/catalog.service';
-import { CommunityService, FavouriteType } from '../../services/community.service';
+import { FavouriteType, ProfileService } from '../../services/profile.service';
 import { NavigationHistoryService } from '../../services/navigation-history.service';
 
 @Component({
@@ -26,7 +26,7 @@ export class CatalogDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private catalogService: CatalogService,
-    private communityService: CommunityService,
+    private profileService: ProfileService,
     private navigationHistory: NavigationHistoryService,
     public authService: AuthService
   ) {
@@ -65,8 +65,8 @@ export class CatalogDetailComponent implements OnInit {
     const type = this.type as FavouriteType;
     if (!id) return;
     const request = this.favourite
-      ? this.communityService.removeFavourite(type, id)
-      : this.communityService.addFavourite(type, id);
+      ? this.profileService.removeFavourite(type, id)
+      : this.profileService.addFavourite(type, id);
     request.subscribe({
       next: () => this.favourite = !this.favourite,
       error: e => this.errorMessage = e.error?.message || 'Could not update favourite'
@@ -112,7 +112,7 @@ export class CatalogDetailComponent implements OnInit {
   private loadFavourite(id: number | null): void {
     this.favourite = false;
     if (!id || !this.authService.isLoggedIn()) return;
-    this.communityService.isFavourite(this.type as FavouriteType, id)
+    this.profileService.isFavourite(this.type as FavouriteType, id)
       .subscribe(value => this.favourite = value.favourite);
   }
 

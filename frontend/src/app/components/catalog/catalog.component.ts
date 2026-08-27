@@ -8,7 +8,7 @@ import { catchError, debounceTime, distinctUntilChanged, finalize, switchMap } f
 import { CatalogSearchResult, CatalogSuggestion } from '../../models/catalog.model';
 import { AuthService } from '../../services/auth.service';
 import { CatalogService } from '../../services/catalog.service';
-import { CommunityService, FavouriteType } from '../../services/community.service';
+import { FavouriteType, ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-catalog',
@@ -36,7 +36,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private catalogService: CatalogService,
-    private communityService: CommunityService,
+    private profileService: ProfileService,
     public authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
@@ -160,8 +160,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.favouriteSaving = key;
     const favourite = this.isFavourite(type, id);
     const request = favourite
-      ? this.communityService.removeFavourite(type, id)
-      : this.communityService.addFavourite(type, id);
+      ? this.profileService.removeFavourite(type, id)
+      : this.profileService.addFavourite(type, id);
 
     request.subscribe({
       next: () => {
@@ -222,7 +222,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   private loadFavourites(): void {
     if (!this.authService.isLoggedIn()) return;
-    this.communityService.getFavouriteIds().subscribe({
+    this.profileService.getFavouriteIds().subscribe({
       next: ids => {
         this.favouriteIds.artists = new Set(ids.artists);
         this.favouriteIds.albums = new Set(ids.albums);

@@ -57,9 +57,6 @@ export interface CreateMusicSectionRequest {
 }
 
 export interface CreateMusicItemRequest {
-  title: string;
-  artist: string;
-  itemType: MusicItemType;
   status: ListeningStatus;
   catalogTrackId?: number | null;
   catalogAlbumId?: number | null;

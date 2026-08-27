@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { Friend, FriendRequest, Invitation, UserSearchResult } from '../../models/community.model';
-import { CommunityService } from '../../services/community.service';
+import { SocialService } from '../../services/social.service';
 
 @Component({
   selector: 'app-friends',
@@ -24,7 +24,7 @@ export class FriendsComponent implements OnInit {
   message = '';
   errorMessage = '';
 
-  constructor(private communityService: CommunityService) {
+  constructor(private socialService: SocialService) {
   }
 
   ngOnInit(): void {
@@ -41,7 +41,7 @@ export class FriendsComponent implements OnInit {
     this.searching = true;
     this.message = '';
     this.errorMessage = '';
-    this.communityService.searchUsers(query).subscribe({
+    this.socialService.searchUsers(query).subscribe({
       next: results => {
         this.searchResults = results;
         this.searching = false;
@@ -56,7 +56,7 @@ export class FriendsComponent implements OnInit {
 
   sendRequest(result: UserSearchResult): void {
     this.clearMessages();
-    this.communityService.sendFriendRequest(result.username).subscribe({
+    this.socialService.sendFriendRequest(result.username).subscribe({
       next: () => {
         result.friendshipStatus = 'PENDING_SENT';
         this.message = 'Friend request sent to ' + result.username + '.';
@@ -67,7 +67,7 @@ export class FriendsComponent implements OnInit {
 
   answerRequest(request: FriendRequest, accept: boolean): void {
     this.clearMessages();
-    this.communityService.answerFriendRequest(request.id, accept).subscribe({
+    this.socialService.answerFriendRequest(request.id, accept).subscribe({
       next: () => {
         this.message = accept ? request.username + ' is now your friend.' : 'Friend request declined.';
         this.loadPage(false);
@@ -79,7 +79,7 @@ export class FriendsComponent implements OnInit {
 
   answerInvitation(invitation: Invitation, accept: boolean): void {
     this.clearMessages();
-    this.communityService.answerInvitation(invitation.id, accept).subscribe({
+    this.socialService.answerInvitation(invitation.id, accept).subscribe({
       next: () => {
         this.invitations = this.invitations.filter(item => item.id !== invitation.id);
         this.message = accept
@@ -94,7 +94,7 @@ export class FriendsComponent implements OnInit {
     if (!window.confirm('Remove ' + friend.username + ' from your friends?')) return;
 
     this.clearMessages();
-    this.communityService.removeFriend(friend.username).subscribe({
+    this.socialService.removeFriend(friend.username).subscribe({
       next: () => {
         this.friends = this.friends.filter(item => item.username !== friend.username);
         this.refreshSearchStatus(friend.username, 'NONE');
@@ -106,7 +106,7 @@ export class FriendsComponent implements OnInit {
 
   private loadPage(showLoading = true): void {
     if (showLoading) this.loading = true;
-    this.communityService.getFriends().subscribe({
+    this.socialService.getFriends().subscribe({
       next: friends => {
         this.friends = friends;
         this.loading = false;
@@ -116,11 +116,11 @@ export class FriendsComponent implements OnInit {
         this.errorMessage = 'Could not load friends';
       }
     });
-    this.communityService.getFriendRequests().subscribe({
+    this.socialService.getFriendRequests().subscribe({
       next: requests => this.requests = requests,
       error: () => this.errorMessage = 'Could not load friend requests'
     });
-    this.communityService.getInvitations().subscribe({
+    this.socialService.getInvitations().subscribe({
       next: invitations => this.invitations = invitations.filter(
         invitation => invitation.status === 'PENDING'
       ),

@@ -5,7 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { GenreStatistic, UpdateProfile, UserProfile } from '../../models/community.model';
 import { AuthService } from '../../services/auth.service';
-import { CommunityService } from '../../services/community.service';
+import { ProfileService } from '../../services/profile.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -32,7 +32,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private service: CommunityService,
+    private service: ProfileService,
     public auth: AuthService
   ) {
   }
@@ -64,7 +64,6 @@ export class ProfileComponent implements OnInit {
   openEditor(): void {
     if (!this.profile || !this.isOwnProfile) return;
     this.editModel = {
-      displayName: this.profile.displayName,
       bio: this.profile.bio || '',
       showArtists: this.profile.showArtists,
       showAlbums: this.profile.showAlbums,
@@ -103,7 +102,7 @@ export class ProfileComponent implements OnInit {
   }
 
   saveProfile(): void {
-    if (!this.editModel || !this.editModel.displayName.trim()) return;
+    if (!this.editModel) return;
     this.saving = true;
     this.editError = '';
     this.service.updateProfile(this.editModel).subscribe({
@@ -125,8 +124,7 @@ export class ProfileComponent implements OnInit {
   }
 
   get visibleAlbums() {
-    const albums = this.profile?.favouriteAlbums || [];
-    return this.showAllAlbums ? albums : albums.slice(0, 6);
+    return this.profile?.favouriteAlbums || [];
   }
 
   get visibleTracks() {

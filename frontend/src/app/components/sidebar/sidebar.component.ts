@@ -4,7 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter, Subscription } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
-import { CommunityService } from '../../services/community.service';
+import { SocialService } from '../../services/social.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,12 +25,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthService,
     private router: Router,
-    private communityService: CommunityService
+    private socialService: SocialService
   ) {
   }
 
   ngOnInit(): void {
-    this.communityService.getInvitations().subscribe({
+    this.socialService.getInvitations().subscribe({
       next: invitations => {
         this.pendingInvitationIds = invitations
           .filter(invitation => invitation.status === 'PENDING')
@@ -39,7 +39,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       },
       error: () => this.pendingInvitationCount = 0
     });
-    this.communityService.getFriendRequests().subscribe({
+    this.socialService.getFriendRequests().subscribe({
       next: requests => {
         this.pendingFriendRequestIds = requests.map(request => request.id);
         this.updateFriendRequestBadge();

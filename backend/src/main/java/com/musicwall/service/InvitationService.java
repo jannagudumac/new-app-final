@@ -64,14 +64,23 @@ public class InvitationService {
     public List<WallMemberDTO> members(String username, Long wallId) {
         MusicWallEntity wall = accessService.findAccessibleWall(username, wallId);
         List<WallMemberDTO> result = new java.util.ArrayList<>();
-        result.add(new WallMemberDTO(wall.getOwner().getUsername(), "OWNER"));
+        result.add(new WallMemberDTO(
+                wall.getOwner().getUsername(),
+                "OWNER"
+        ));
         membershipRepository.findByWallIdOrderByJoinedAtAsc(wallId).stream()
                 .filter(item -> !item.getUser().getUsername().equals(wall.getOwner().getUsername()))
-                .forEach(item -> result.add(new WallMemberDTO(item.getUser().getUsername(), item.getRole().name())));
+                .forEach(item -> result.add(new WallMemberDTO(
+                        item.getUser().getUsername(),
+                        item.getRole().name()
+                )));
         return result;
     }
     private InvitationDTO convert(WallInvitationEntity entity) {
         InvitationDTO dto = new InvitationDTO(); dto.setId(entity.getId()); dto.setWallId(entity.getWall().getId());
-        dto.setWallName(entity.getWall().getName()); dto.setInvitedByUsername(entity.getInvitedBy().getUsername()); dto.setStatus(entity.getStatus().name()); return dto;
+        dto.setWallName(entity.getWall().getName());
+        dto.setInvitedByUsername(entity.getInvitedBy().getUsername());
+        dto.setStatus(entity.getStatus().name());
+        return dto;
     }
 }

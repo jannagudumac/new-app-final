@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CommunityServiceTest {
+class ProfileServiceTest {
     @Mock UserRepository users; @Mock TrackRepository tracks; @Mock AlbumRepository albums; @Mock ArtistRepository artists;
     @Mock TrackFavouriteRepository trackFavourites; @Mock AlbumFavouriteRepository albumFavourites;
     @Mock ArtistFavouriteRepository artistFavourites;
-    CommunityService service;
-    @BeforeEach void setUp(){service=new CommunityService(users,tracks,albums,artists,trackFavourites,albumFavourites,artistFavourites);}
+    ProfileService service;
+    @BeforeEach void setUp(){service=new ProfileService(users,tracks,albums,artists,trackFavourites,albumFavourites,artistFavourites);}
 
     @Test void removingFavouriteOnlyDeletesCurrentUsersRelationship(){
         var favourite=new com.musicwall.entity.TrackFavouriteEntity();

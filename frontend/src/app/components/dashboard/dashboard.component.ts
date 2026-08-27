@@ -5,8 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 
 import { MusicWall } from '../../models/music-wall.model';
 import { AuthService } from '../../services/auth.service';
-import { CommunityService } from '../../services/community.service';
 import { MusicWallService } from '../../services/music-wall.service';
+import { ProfileService } from '../../services/profile.service';
+import { SocialService } from '../../services/social.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +26,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private musicWallService: MusicWallService,
-    private communityService: CommunityService,
+    private profileService: ProfileService,
+    private socialService: SocialService,
     private authService: AuthService,
     private router: Router
   ) {
@@ -62,7 +64,7 @@ export class DashboardComponent implements OnInit {
   }
 
   loadInvitations(): void {
-    this.communityService.getInvitations().subscribe({
+    this.socialService.getInvitations().subscribe({
       next: invitations => {
         this.pendingInvitationCount = invitations.filter(
           invitation => invitation.status === 'PENDING'
@@ -80,8 +82,10 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    this.communityService.getProfile(username).subscribe({
-      next: profile => this.favouriteTrackCount = profile.favouriteTracks.length,
+    this.profileService.getProfile(username).subscribe({
+      next: profile => {
+        this.favouriteTrackCount = profile.favouriteTracks.length;
+      },
       error: () => this.favouriteTrackCount = 0
     });
   }

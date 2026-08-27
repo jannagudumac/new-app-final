@@ -46,9 +46,6 @@ public class MusicItemService {
     ) {
         verifyWallAccess(username, wallId);
         MusicSectionEntity section = findSectionInWall(sectionId, wallId);
-        if (request.getCatalogTrackId() == null && request.getCatalogAlbumId() == null) {
-            throw new BusinessException("Choose a track or album from MusicBrainz");
-        }
 
         MusicItemEntity item = new MusicItemEntity();
         applyRequest(item, request);
@@ -115,15 +112,20 @@ public class MusicItemService {
         if (request.getCatalogTrackId() != null) {
             var track = trackRepository.findById(request.getCatalogTrackId())
                     .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
-            item.setCatalogTrack(track); item.setTitle(track.getTitle()); item.setArtist(track.getArtist().getName());
+            item.setCatalogTrack(track);
+            item.setTitle(track.getTitle());
+            item.setArtist(track.getArtist().getName());
+            item.setItemType(MusicItemType.TRACK);
         } else if (request.getCatalogAlbumId() != null) {
             var album = albumRepository.findById(request.getCatalogAlbumId())
                     .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
-            item.setCatalogAlbum(album); item.setTitle(album.getTitle()); item.setArtist(album.getArtist().getName());
+            item.setCatalogAlbum(album);
+            item.setTitle(album.getTitle());
+            item.setArtist(album.getArtist().getName());
+            item.setItemType(MusicItemType.ALBUM);
         } else {
-            item.setTitle(request.getTitle()); item.setArtist(request.getArtist());
+            throw new BusinessException("Choose a track or album from the catalogue");
         }
-        item.setItemType(MusicItemType.valueOf(request.getItemType()));
         item.setStatus(ListeningStatus.valueOf(request.getStatus()));
     }
 

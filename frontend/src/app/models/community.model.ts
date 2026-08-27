@@ -3,7 +3,6 @@ export interface GenreStatistic { genre: string; count: number; }
 export interface FavouriteIds { artists: number[]; albums: number[]; tracks: number[]; }
 export interface UserProfile {
   username: string;
-  displayName: string;
   bio: string | null;
   avatarUrl: string | null;
   showArtists: boolean;
@@ -16,7 +15,6 @@ export interface UserProfile {
   genreStatistics: GenreStatistic[];
 }
 export interface UpdateProfile {
-  displayName: string;
   bio: string;
   showArtists: boolean;
   showAlbums: boolean;

@@ -15,7 +15,7 @@ import {
 } from '../../models/music-wall.model';
 import { MusicWallService } from '../../services/music-wall.service';
 import { CatalogService } from '../../services/catalog.service';
-import { CommunityService } from '../../services/community.service';
+import { SocialService } from '../../services/social.service';
 import { Album, Track } from '../../models/catalog.model';
 import { Friend, WallMember } from '../../models/community.model';
 import { AuthService } from '../../services/auth.service';
@@ -90,7 +90,7 @@ export class WallDetailComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private musicWallService: MusicWallService,
     private catalogService: CatalogService,
-    private communityService: CommunityService,
+    private socialService: SocialService,
     private pageHeaderService: PageHeaderService,
     public authService: AuthService
   ) {
@@ -291,9 +291,6 @@ export class WallDetailComponent implements OnInit, OnDestroy {
   addCatalogResult(section: MusicSection, itemType: 'TRACK' | 'ALBUM', item: Track | Album): void {
     if (this.saving || !item.id || this.isCatalogResultAdded(section, itemType, item.id)) return;
     const request: CreateMusicItemRequest = {
-      title: item.title,
-      artist: item.artistName,
-      itemType,
       status: 'TO_LISTEN',
       catalogTrackId: itemType === 'TRACK' ? item.id : null,
       catalogAlbumId: itemType === 'ALBUM' ? item.id : null
@@ -320,9 +317,6 @@ export class WallDetailComponent implements OnInit, OnDestroy {
       item.status === 'LISTENED' ? 'TO_LISTEN' : 'LISTENED';
 
     const request: CreateMusicItemRequest = {
-      title: item.title,
-      artist: item.artist,
-      itemType: item.itemType,
       status: newStatus,
       catalogTrackId: item.catalogTrackId,
       catalogAlbumId: item.catalogAlbumId
@@ -422,7 +416,7 @@ export class WallDetailComponent implements OnInit, OnDestroy {
     this.inviting = true;
     this.inviteMessage = '';
     this.inviteError = '';
-    this.communityService.invite(this.wallId, username).subscribe({
+    this.socialService.invite(this.wallId, username).subscribe({
       next: () => {
         this.inviteMessage = 'Invitation sent to ' + username + '.';
         this.invitedFriendNames.add(username);
@@ -442,7 +436,7 @@ export class WallDetailComponent implements OnInit, OnDestroy {
     this.inviteError = '';
   }
 
-  private loadMembers(): void { this.communityService.getMembers(this.wallId).subscribe({ next: value => this.members = value }); }
+  private loadMembers(): void { this.socialService.getMembers(this.wallId).subscribe({ next: value => this.members = value }); }
 
   get availableFriends(): Friend[] {
     const memberNames = new Set(this.members.map(member => member.username));
@@ -452,7 +446,7 @@ export class WallDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadFriends(): void {
-    this.communityService.getFriends().subscribe({
+    this.socialService.getFriends().subscribe({
       next: friends => this.friends = friends,
       error: () => this.friends = []
     });

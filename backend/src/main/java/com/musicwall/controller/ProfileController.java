@@ -3,7 +3,7 @@ import com.musicwall.dto.FavouriteIdsDTO;
 import com.musicwall.dto.ProfileDTO;
 import com.musicwall.dto.ProfileAvatarDTO;
 import com.musicwall.dto.UpdateProfileDTO;
-import com.musicwall.service.CommunityService;
+import com.musicwall.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
@@ -15,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api")
 public class ProfileController {
-    private final CommunityService service;
-    public ProfileController(CommunityService service) { this.service = service; }
+    private final ProfileService service;
+    public ProfileController(ProfileService service) { this.service = service; }
     @GetMapping("/profiles/{username}")
     public ResponseEntity<ProfileDTO> profile(@PathVariable String username, Authentication auth) {
         return ResponseEntity.ok(service.getProfile(username, auth == null ? "" : auth.getName()));

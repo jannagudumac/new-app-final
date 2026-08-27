@@ -24,7 +24,6 @@ public class UserEntity {
     @Column(nullable = false)
     private String role;
 
-    private String displayName;
 
     @Column(length = 240)
     private String bio;
@@ -81,8 +80,6 @@ public class UserEntity {
         this.role = role;
     }
 
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
     public byte[] getAvatarImage() { return avatarImage; }

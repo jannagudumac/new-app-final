@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
-public class CommunityService {
+public class ProfileService {
     private static final long MAX_AVATAR_SIZE = 2 * 1024 * 1024;
     private static final Set<String> AVATAR_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
     private final UserRepository userRepository;
@@ -24,7 +24,7 @@ public class CommunityService {
     private final AlbumFavouriteRepository albumFavouriteRepository;
     private final ArtistFavouriteRepository artistFavouriteRepository;
 
-    public CommunityService(UserRepository userRepository, TrackRepository trackRepository,
+    public ProfileService(UserRepository userRepository, TrackRepository trackRepository,
                             AlbumRepository albumRepository, ArtistRepository artistRepository,
                             TrackFavouriteRepository trackFavouriteRepository,
                             AlbumFavouriteRepository albumFavouriteRepository,
@@ -121,8 +121,6 @@ public class CommunityService {
 
         ProfileDTO dto = new ProfileDTO();
         dto.setUsername(username);
-        dto.setDisplayName(user.getDisplayName() == null || user.getDisplayName().isBlank()
-                ? username : user.getDisplayName());
         dto.setBio(user.getBio());
         dto.setAvatarUrl(user.getAvatarImage() == null ? null : "/api/profiles/" + username + "/avatar");
         dto.setShowArtists(user.isShowArtists());
@@ -147,7 +145,6 @@ public class CommunityService {
     @Transactional
     public ProfileDTO updateProfile(String username, UpdateProfileDTO request) {
         UserEntity user = findUser(username);
-        user.setDisplayName(request.getDisplayName().trim());
         user.setBio(cleanOptional(request.getBio()));
         user.setShowArtists(request.isShowArtists());
         user.setShowAlbums(request.isShowAlbums());
