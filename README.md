@@ -1,103 +1,192 @@
-# Music Wall - simple course-style version
+# Music Wall
 
-This project is a simpler reconstruction of the first Music Wall milestone.
-It is independent from `new-app`.
+Music Wall is a student full-stack application for discovering music, saving
+favourites and building shared listening walls with friends. A wall is divided
+into coloured paper-like sections (for example Jazz, Summer or Focus), and each
+section can contain albums or tracks from the local catalogue.
+
+This repository contains only the final course-style version of the project.
+It deliberately uses a conventional controller / DTO / entity / repository /
+service structure so that the code remains understandable and presentable in a
+student project.
 
 ## Current features
 
-- register with a username and password;
-- login and receive a JWT;
-- create a private music wall;
-- the authenticated user automatically becomes its owner;
-- display the authenticated user's walls on the dashboard;
-- prevent another user from opening or changing a wall they do not own;
-- open a wall detail page;
-- edit and delete a wall;
-- create, rename and delete custom sections such as Bebop or Baroque;
-- add tracks and albums to a section;
-- mark each item as `TO_LISTEN` or `LISTENED`;
-- edit and delete tracks and albums;
-- choose No wallpaper or one of eight imported music-themed patterns;
-- choose the base color of each wall with a color picker;
-- display sections as taped paper notes on the selected wall background;
-- responsive authenticated layout with a collapsible desktop sidebar and a
-  thin translucent bottom navigation ribbon on phones;
-- dashboard overview and a separate My Walls page.
-- local catalogue search across imported artists, albums, tracks and genres;
-- public artist, album and track detail pages;
-- controlled one-time catalogue import from MusicBrainz;
-- add catalogue tracks and albums to private wall sections;
-- favourite tracks and show them on public user profiles;
-- calculate genre statistics from a user's favourite tracks;
-- invite registered users to walls and accept or reject invitations;
-- OWNER and MEMBER wall roles with backend membership checks;
-- optional Ticketmaster concert search through the Spring Boot backend.
+### Accounts and security
 
-Legacy manually entered wall cards remain readable, while new cards can point
-to global catalogue records. Concert search is the only optional feature: it
-requires a Ticketmaster developer key in `backend/.env`.
+- registration and login with a username and password;
+- BCrypt password hashing;
+- JWT authentication with Spring Security;
+- authenticated user derived from the JWT, never from a user ID sent by Angular;
+- one immutable `username` used everywhere in the application;
+- no editable username or separate display name;
+- centralized validation and JSON error responses.
 
-## Project structure
+There are no default login credentials. Create an account on the Register page.
 
-Backend:
+### Music walls
 
-```text
-controller  receives HTTP requests
-dto         data exchanged with Angular
-entity      Java classes mapped to PostgreSQL tables
-repository  communicates with the database
-service     contains the application logic
-security    JWT and Spring Security configuration
-exception   converts exceptions into simple HTTP error messages
-```
+- create, open, edit and delete personal walls;
+- creator automatically becomes the wall `OWNER`;
+- inline wall title and description editing;
+- create, rename, recolour and delete wall sections;
+- add catalogue tracks or albums to a section;
+- mark wall items as `TO_LISTEN` or `LISTENED`;
+- remove music from a section;
+- nine music-themed wallpapers plus a no-wallpaper option;
+- configurable wall colour when no wallpaper is selected;
+- paper-note colours, tape decoration and responsive two-column layout;
+- desktop sidebar, collapsed icon rail and mobile bottom navigation.
 
-Frontend:
+Owners can rename and delete their walls and invite collaborators. Both owners
+and accepted members can open the wall, manage its sections and music, and
+change its appearance. The backend checks all wall access in the service layer.
+
+### Friends and invitations
+
+- search registered users by username;
+- send, accept and reject friend requests;
+- view and remove friends;
+- invite friends to a wall;
+- accept or reject wall invitations;
+- view owner and member profiles from a wall;
+- pending friend requests and wall invitations are shown together on the
+  Friends page;
+- removing a friend invalidates pending wall invitations between both users.
+
+Only friends can be invited to a wall. This keeps the collaboration flow simple:
 
 ```text
-components   pages displayed to the user
-             layout and sidebar build the authenticated application shell
-models       TypeScript interfaces
-services     HTTP calls to the backend
-guards       protects the dashboard route
-interceptors adds the JWT to HTTP requests
+find user -> become friends -> invite friend -> friend accepts -> wall member
 ```
+
+### Catalogue and favourites
+
+- local PostgreSQL catalogue containing artists, albums, tracks and genres;
+- search, suggestions and filters for artists, albums and tracks;
+- artist, album and track detail pages;
+- album track lists and links between related catalogue pages;
+- cover artwork URLs imported from MusicBrainz / Cover Art Archive data;
+- favourite and unfavourite artists, albums and tracks;
+- add catalogue albums and tracks directly to wall sections;
+- back-navigation remembers whether the user came from the catalogue, profile,
+  album, artist, track or wall.
+
+Normal catalogue browsing does **not** call MusicBrainz. The application reads
+the already imported catalogue from PostgreSQL, which makes the UI faster and
+keeps the runtime architecture easier to explain.
+
+### Profiles and statistics
+
+- public profile pages addressed by immutable username;
+- optional short bio;
+- avatar upload from the user's computer (stored in PostgreSQL);
+- favourite artists, albums and tracks;
+- compact carousels and `View all` controls;
+- favourite-genre distribution displayed as a donut chart;
+- visibility settings for artists, albums, tracks and music taste;
+- other users' profiles are read-only.
+
+### Concerts
+
+- optional concert search through the backend;
+- uses Ticketmaster only when `TICKETMASTER_API_KEY` is configured;
+- the rest of the application works without this key.
 
 ## Technologies
 
-- Java 17 and Spring Boot;
-- Spring Data JPA;
-- Spring Security and JWT;
-- PostgreSQL installed locally;
-- Angular 19 standalone components;
-- ordinary component CSS with native Flexbox/Grid layouts;
-- Hibernate `ddl-auto=update` (no Flyway);
-- no Docker.
+### Backend
 
-Angular Material and Tailwind are not used. The sidebar is an ordinary Angular
-component and every visual rule is written in its component CSS file.
+- Java 17;
+- Spring Boot 3.5;
+- Spring Web;
+- Spring Data JPA / Hibernate;
+- Spring Security;
+- JWT (`jjwt`);
+- Bean Validation;
+- PostgreSQL;
+- Maven Wrapper;
+- JUnit 5 and Mockito.
 
-The wall detail page opens its backgrounds from a compact Customize popover
-with visual previews. Its circular rainbow button uses the
-browser's native color selector while avoiding the large rectangular color
-input in the page layout. The selected color fills the complete page. Wallpaper
-Eight seamless patterns from the supplied `backgrounds` packages are stored as
-web-optimized JPEG files in `frontend/src/assets/wallpapers`. Their names
-in the switcher are Midnight Cassettes, Mint Tape Grid, Acoustic Pastels,
-School Jam, Carnival Night, Music Doodles, Retro Hi-Fi and Vintage Sound.
+### Frontend
 
-## 1. Prepare PostgreSQL
+- Angular 19;
+- standalone components;
+- Angular Router, HttpClient and template-driven forms;
+- RxJS;
+- ordinary CSS with Flexbox and Grid;
+- DM Serif Display for headings and Nunito for interface text.
 
-Start your locally installed PostgreSQL server.
+Angular Material, Tailwind and Docker are not required. Database tables are
+managed by Hibernate with `spring.jpa.hibernate.ddl-auto=update`; Flyway is not
+used in this simplified version.
 
-Create the empty database with pgAdmin, or execute:
+## Project structure
+
+```text
+new-app-final/
+|-- backend/
+|   |-- src/main/java/com/musicwall/
+|   |   |-- controller/   REST endpoints
+|   |   |-- dto/          JSON request and response objects
+|   |   |-- entity/       PostgreSQL/JPA table mappings
+|   |   |-- repository/   Spring Data database access
+|   |   |-- service/      application logic and authorization
+|   |   |-- security/     JWT filter and Spring Security configuration
+|   |   `-- exception/    centralized API error handling
+|   |-- src/test/         focused service tests
+|   |-- .env.example
+|   |-- import-catalog.cmd
+|   `-- mvnw.cmd
+|-- frontend/
+|   `-- src/app/
+|       |-- components/   pages and shared layout
+|       |-- models/       TypeScript API interfaces
+|       |-- services/     backend HTTP calls
+|       |-- guards/       protected-route check
+|       `-- interceptors/ JWT request header
+|-- create-database.sql
+|-- start-all.cmd
+`-- start-all.ps1
+```
+
+The backend keeps entities behind DTOs. Controllers receive and return DTOs;
+services load and modify entities; repositories communicate with PostgreSQL.
+
+Frontend HTTP services are separated by purpose:
+
+```text
+AuthService       login, registration and local JWT session
+MusicWallService walls, sections and wall items
+CatalogService    catalogue search and detail pages
+ProfileService    profiles, avatars and favourites
+SocialService     friends and invitations
+ConcertService    optional concert search
+```
+
+## Local setup
+
+### Prerequisites
+
+- Java 17;
+- Node.js and npm;
+- locally installed PostgreSQL;
+- port `5432` available for PostgreSQL;
+- ports `8080` and `4200` available for backend and frontend.
+
+Docker is not needed for this project.
+
+### 1. Create the PostgreSQL database
+
+Start PostgreSQL and create the database in pgAdmin or execute:
 
 ```sql
 CREATE DATABASE music_wall_final;
 ```
 
-The same command is available in `create-database.sql`.
+The same command is stored in `create-database.sql`.
 
-The default backend configuration expects:
+Default connection values are:
 
 ```text
 host:     localhost
@@ -107,70 +196,93 @@ username: postgres
 password: postgres
 ```
 
-If your PostgreSQL password is different, copy `backend/.env.example` to
-`backend/.env` and replace `DB_PASSWORD` with your real password. Do not add
-spaces around `=`.
+Copy the environment example before the first backend start:
 
-Hibernate will create the wall and catalogue tables plus favourites,
-memberships and invitations when the backend starts. Restart the backend after
-pulling changes so Hibernate can update the schema.
+```powershell
+cd C:\new_music_app\new-app-final\backend
+Copy-Item .env.example .env
+```
 
-## 2. Install frontend dependencies
+Then edit `backend/.env`:
 
-This is needed only the first time:
+```properties
+DB_URL=jdbc:postgresql://localhost:5432/music_wall_final
+DB_USERNAME=postgres
+DB_PASSWORD=your_real_postgresql_password
+JWT_SECRET=replace_with_a_long_random_secret_of_at_least_32_characters
+TICKETMASTER_API_KEY=
+MUSICBRAINZ_USER_AGENT=MusicWallStudentProject/1.0 (your-email@example.com)
+```
+
+Do not commit `backend/.env`. Hibernate creates or updates the tables when the
+backend starts.
+
+### 2. Install Angular dependencies
+
+This is needed once after cloning:
 
 ```powershell
 cd C:\new_music_app\new-app-final\frontend
 npm install
 ```
 
-## 3. Import the selected music catalogue
+### 3. Start the application
 
-The artist list is stored in:
-
-```text
-backend/src/main/resources/catalog-artists.json
-```
-
-Each entry contains a readable name, an exact MusicBrainz ID and the maximum
-number of albums to import. Once PostgreSQL is running, double-click:
-
-```text
-backend/import-catalog.cmd
-```
-
-The command imports artists, release groups as albums, one official release
-and its recordings as tracks. It can take several minutes because MusicBrainz
-limits request speed. If MusicBrainz is temporarily unavailable, stop with
-Ctrl+C and run the command again later. Existing MusicBrainz IDs and the
-`catalog_imported` flag prevent duplicate data and let the import continue.
-
-Normal application searches never call MusicBrainz. After import they use the
-ordinary local PostgreSQL repositories.
-
-## 4. Start everything
-
-Make sure PostgreSQL is running, then double-click `start-all.cmd`, or run:
+Make sure PostgreSQL is already running. Then double-click `start-all.cmd`, or:
 
 ```powershell
 cd C:\new_music_app\new-app-final
 .\start-all.ps1
 ```
 
-The launcher opens two visible terminals:
+The launcher opens backend and frontend in separate PowerShell windows:
 
-- backend: `http://localhost:8080`;
-- frontend: `http://localhost:4200`.
+- frontend: <http://localhost:4200>
+- backend: <http://localhost:8080>
 
-PostgreSQL is not started by this script. It uses the PostgreSQL service
-already installed on your computer.
+The launcher does not start PostgreSQL.
 
-## Backend flow in simple terms
+You can also start each part manually:
 
-Registration:
+```powershell
+# backend
+cd C:\new_music_app\new-app-final\backend
+.\mvnw.cmd spring-boot:run
+
+# frontend (in another terminal)
+cd C:\new_music_app\new-app-final\frontend
+npm start
+```
+
+## Curated MusicBrainz import
+
+The selected artists and exact MusicBrainz IDs are stored in:
 
 ```text
-RegisterComponent
+backend/src/main/resources/catalog-artists.json
+```
+
+To populate an empty catalogue, make sure PostgreSQL is running and launch:
+
+```text
+backend/import-catalog.cmd
+```
+
+The importer downloads a controlled subset of albums, recordings and genres
+for the configured artists. It can take several minutes because MusicBrainz
+limits request speed. Existing MusicBrainz IDs prevent duplicate catalogue
+records, so an interrupted import can be run again.
+
+The import is a maintenance command, not part of normal user search. Do not run
+it while the ordinary backend is already using port `8080`; stop that backend
+first, run the import, then relaunch the application.
+
+## Important backend flows
+
+### Registration and login
+
+```text
+Angular form
   -> AuthService (Angular)
   -> AuthController
   -> AuthService (Spring)
@@ -178,85 +290,99 @@ RegisterComponent
   -> PostgreSQL
 ```
 
-Creating a wall:
+After login, Angular stores the JWT and immutable username. The interceptor adds
+the token to protected HTTP requests. There is no editable `displayName` field.
+
+### Creating and accessing a wall
 
 ```text
-DashboardComponent sends only name and description
-  -> JwtFilter identifies the user from the token
-  -> MusicWallController reads Authentication.getName()
-  -> MusicWallService loads that user and sets wall.owner
-  -> MusicWallRepository saves the wall
+Angular sends wall data
+  -> JwtFilter validates the token
+  -> controller reads Authentication.getName()
+  -> service uses that username
+  -> repository reads or writes PostgreSQL
 ```
 
-Angular never sends an owner ID. The backend decides who the owner is from the
-authenticated username.
+Angular never supplies an owner ID. The backend sets the authenticated user as
+the owner when a wall is created.
 
-Opening or changing wall content follows the same security rule:
+`WallAccessService` contains the central rules:
 
 ```text
-Angular sends the wall ID and the content to change
-  -> JwtFilter identifies the logged-in username
-  -> Controller passes that username to the service
-  -> Service loads a wall belonging to that username
-  -> only then does it read or change sections and music items
+findOwnedWall       owner-only operations such as deleting a wall or inviting
+findAccessibleWall  operations available to the owner and accepted members
 ```
 
-This check lives in the service layer, not only in the page. Hiding a button in
-Angular is useful for the interface, but it is not security because an HTTP
-request can be sent without using Angular.
+This is real authorization. Hiding a button in Angular improves the interface,
+but the backend service check is what prevents unauthorized HTTP requests.
 
-The data hierarchy is deliberately simple:
+### Catalogue model
 
 ```text
-MusicWallEntity
-  -> MusicSectionEntity (Bebop, Baroque, ...)
-       -> MusicItemEntity (track or album, to listen or listened)
+ArtistEntity
+  -> AlbumEntity
+       -> TrackEntity
+
+AlbumEntity <-> GenreEntity
+TrackEntity <-> GenreEntity
 ```
 
-Entities represent database tables. DTO classes represent JSON exchanged with
-Angular, so JPA entities are not exposed directly by the controllers.
+An album or track placed on a wall keeps a reference to the corresponding local
+catalogue entity. Users do not type a second custom title or artist name.
 
-Catalogue search follows the same layers:
+## Frontend routes
 
 ```text
-CatalogComponent
-  -> CatalogService (Angular HTTP calls)
-  -> CatalogController
-  -> CatalogService (Spring application logic)
-  -> Artist/Album/Track/Genre repositories
-  -> PostgreSQL
+/login             login
+/register          registration
+/dashboard         overview and recent walls
+/walls             complete wall list and quick wall creation
+/walls/:id         wall detail, members, sections and music
+/catalog            catalogue search
+/catalog/:type/:id artist, album or track detail
+/profile            current user's profile
+/users/:username    another user's public profile
+/friends            friends, friend requests and wall invitations
+/concerts           optional concert search
 ```
 
-Albums and tracks reference an artist. Their many-to-many genre relationships
-use the `album_genre` and `track_genre` join tables. A join table is needed
-because one track can have several genres and one genre can describe several
-tracks. Public `GET /api/catalog/**` requests do not require a JWT. MusicBrainz
-is used only by the separate local import command, not by catalogue searches.
+The Angular application places these pages inside one authenticated layout.
+Catalogue and profile `GET` endpoints are public at backend level, but the
+current Angular routes are inside the authenticated application shell.
 
-## Frontend pages
+## Tests and verification
 
-```text
-/login       public login form
-/register    public registration form
-/catalog     search in the selected local catalogue
-/catalog/:type/:id public artist, album or track details
-/profile     protected personal favourites and favourite-genre statistics
-/users/:username public profile
-/invitations protected pending wall invitations
-/concerts    protected optional Ticketmaster concert search
-/dashboard   protected overview, wall count and recent walls
-/walls       protected wall creation and complete wall list
-/walls/:id   protected wall detail with sections, tracks and albums
+Run backend tests:
+
+```powershell
+cd C:\new_music_app\new-app-final\backend
+.\mvnw.cmd test
 ```
 
-`LayoutComponent` owns one simple boolean:
+The current suite contains focused tests for catalogue logic, friendships,
+invitations, MusicBrainz import, wall sections and profiles.
 
-```text
-sidebarCollapsed controls the narrow desktop icon rail
+Build the Angular application:
+
+```powershell
+cd C:\new_music_app\new-app-final\frontend
+npm run build
 ```
 
-`SidebarComponent` contains navigation and logout. On desktop its burger button
-switches between the full menu and the narrow icon rail. On a small screen CSS
-turns the same component into a fixed bottom ribbon with Dashboard, My walls
-and Logout buttons. This keeps the Angular logic simple: there is no separate
-mobile menu state or drawer overlay.
+At the time of this README update:
+
+- all 21 backend tests pass;
+- the Angular production build succeeds;
+- Angular reports a non-blocking initial-bundle budget warning (about 560 kB
+  versus the configured 500 kB budget).
+
+## Current limitations
+
+- PostgreSQL must be started separately;
+- catalogue contents are limited to the curated MusicBrainz import;
+- MusicBrainz availability only affects the import command, not normal browsing;
+- concert results require a valid Ticketmaster API key;
+- there is no email verification, password reset or administrator interface;
+- wall invitations are restricted to accepted friends;
+- Hibernate updates schemas but does not provide versioned migrations;
+- this is a course project, not a production deployment configuration.
